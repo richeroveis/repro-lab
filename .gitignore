@@ -1,0 +1,33 @@
+# Secrets - never commit .env contents
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+
+# Node / frontend build output
+node_modules/
+dist/
+
+# gltest scratch output (repo root only)
+/artifacts/
+
+# Large or scratch media artifacts
+*.webm
+*.wav
+
+# Evidence scratch checkpoint (regenerated each run)
+evidence/_checkpoint.json
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+
+# Whitelisted demo assets that must ship in the repo
+!docs/demo-video-subtitled.mp4
+!frontend/public/demo-video-subtitled.mp4
