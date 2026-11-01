@@ -24,6 +24,12 @@ dist/
 # Evidence scratch checkpoint and run log (regenerated each run)
 evidence/_checkpoint.json
 evidence/_run.log
+evidence/_verify2.log
+evidence/_lint1.txt
+evidence/_lint2.txt
+
+# Generated media scratch (video frames, wav beds); final mp4 and png are tracked
+build/
 
 # Publish helpers (contain nothing, created and removed per run)
 .git-askpass.cmd

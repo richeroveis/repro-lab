@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { LEDGER, NETWORK, RLT_TOKEN } from './chain.js';
+import { EXPLORER_ADDRESS, LEDGER, NETWORK, RLT_TOKEN } from './chain.js';
 import { useLedger, useWallet } from './useLedger.js';
 import RegistryVault from './components/RegistryVault.jsx';
 import DeviationMatrix from './components/DeviationMatrix.jsx';
@@ -67,10 +67,13 @@ export default function App() {
   return (
     <div className="frame">
       <div className="masthead">
-        <div>
-          <h1>ReproLab</h1>
-          <div className="sub">
-            Empirical replication notebook and peer-review ledger / GenLayer studionet
+        <div className="row" style={{ gap: 18, alignItems: 'center' }}>
+          <img className="insignia" src="./logo.png" alt="ReproLab insignia" width="72" height="72" />
+          <div>
+            <h1>ReproLab</h1>
+            <div className="sub">
+              Empirical replication notebook and peer-review ledger / GenLayer studionet
+            </div>
           </div>
         </div>
         <div className="row">
@@ -81,11 +84,19 @@ export default function App() {
 
       <div className="strip">
         <div className="cell">
-          <b style={{ wordBreak: 'break-all' }}>{LEDGER}</b>
-          <span>ledger contract</span>
+          <b style={{ wordBreak: 'break-all' }}>
+            <a href={EXPLORER_ADDRESS(LEDGER)} target="_blank" rel="noreferrer">
+              {LEDGER}
+            </a>
+          </b>
+          <span>ledger contract, studio explorer</span>
         </div>
         <div className="cell">
-          <b style={{ wordBreak: 'break-all' }}>{RLT_TOKEN}</b>
+          <b style={{ wordBreak: 'break-all' }}>
+            <a href={EXPLORER_ADDRESS(RLT_TOKEN)} target="_blank" rel="noreferrer">
+              {RLT_TOKEN}
+            </a>
+          </b>
           <span>RLT endowment token</span>
         </div>
         <div className="cell">
@@ -99,6 +110,22 @@ export default function App() {
       </div>
 
       {ledger.error ? <p className="hint">{ledger.error}</p> : null}
+
+      <details className="brief">
+        <summary>Field brief: 50 seconds, burned-in subtitles and synthesized lab ambience</summary>
+        <video
+          controls
+          preload="metadata"
+          width="1280"
+          height="720"
+          src="./demo-video-subtitled.mp4"
+          title="ReproLab demo brief"
+        />
+        <p className="hint">
+          Every number in the brief is read from this deployment by
+          scripts/compile_empirical_video_brief.py.
+        </p>
+      </details>
 
       <div className="grid">
         <div>

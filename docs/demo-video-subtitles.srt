@@ -1,0 +1,35 @@
+1
+00:00:00,000 --> 00:00:05,000
+ReproLab settles replication claims with validator consensus
+
+2
+00:00:05,000 --> 00:00:09,500
+Four studies registered against a real endowment pool on studionet
+
+3
+00:00:09,500 --> 00:00:14,000
+The author self-replication attempt was absorbed as a refundable credit
+
+4
+00:00:14,000 --> 00:00:24,000
+Audited scores snap to a 250 basis point grid before a band is bound
+
+5
+00:00:24,000 --> 00:00:29,500
+Live evaluators fetched the artifacts and agreed on all seven decision fields
+
+6
+00:00:29,500 --> 00:00:35,000
+Two independent labs bonded stakes and one challenged the first ruling
+
+7
+00:00:35,000 --> 00:00:39,000
+Rejected payables become withdrawable credit and the custody books still balance
+
+8
+00:00:39,000 --> 00:00:43,000
+Every rejected payable became withdrawable credit and was claimed
+
+9
+00:00:43,000 --> 00:00:50,000
+Every claim in this brief is backed by a transaction and a source hash

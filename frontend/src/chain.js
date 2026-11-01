@@ -6,9 +6,10 @@ export const NETWORK = {
   name: 'studionet',
   chainId: 61999,
   rpc: 'https://studio.genlayer.com/api',
-  explorer: 'https://genlayer-explorer.vercel.app',
+  explorer: 'https://explorer-studio.genlayer.com',
 };
 export const EXPLORER_TX = (hash) => `${NETWORK.explorer}/tx/${hash}`;
+export const EXPLORER_ADDRESS = (address) => `${NETWORK.explorer}/address/${address}`;
 
 // Verdict grid constants, mirrored from contracts/repro_lab.py so the
 // workbench can preview a ruling before a lab spends a bond.

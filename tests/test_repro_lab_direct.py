@@ -873,3 +873,89 @@ def test_fraud_slash_target_is_the_pi(direct_deploy, direct_vm, direct_alice, di
     c.evaluate_replication_trial(1)
     card = c.get_study_card(1)
     assert card["slash_target"] == hexof(direct_alice).lower()
+
+
+# ------------------------------------------------ review regression coverage
+# These three tests pin the findings written up in docs/adversarial-review.md.
+# They describe behavior as deployed, they do not ask for a change to it.
+
+
+def test_stake_debits_pool_and_bond_is_reserved_twice(direct_deploy, direct_vm, direct_alice, direct_bob):
+    """F-B: a bond lowers the pool book and is also counted as a reservation."""
+    c = deploy(direct_deploy, direct_vm, direct_alice)
+    mock_pages(direct_vm)
+    fund(direct_vm, direct_alice, c)
+    register(direct_vm, c, direct_alice)
+    pool_before = int(c.get_lab_overview()["endowment_pool_atto"])
+    stake(direct_vm, c, direct_bob)
+    ov = c.get_lab_overview()
+    assert int(ov["endowment_pool_atto"]) == pool_before - BOND
+    assert int(ov["open_bonds_atto"]) == BOND
+    assert int(ov["reserve_required_atto"]) == 10 * E1 * 150 // 100 + BOND
+
+
+def test_released_bond_stays_above_published_buckets(direct_deploy, direct_vm, direct_alice, direct_bob):
+    """F-B: after settlement the released bond never returns to the pool book."""
+    c = deploy(direct_deploy, direct_vm, direct_alice)
+    mock_pages(direct_vm)
+    mock_audit(direct_vm, 5000)
+    fund(direct_vm, direct_alice, c)
+    register(direct_vm, c, direct_alice)
+    pool_before = int(c.get_lab_overview()["endowment_pool_atto"])
+    stake(direct_vm, c, direct_bob)
+    direct_vm.sender = direct_alice
+    c.submit_author_response(1, "ok")
+    direct_vm.warp("2026-01-01T00:06:00+00:00")
+    c.evaluate_replication_trial(1)
+    direct_vm.warp("2026-01-01T00:15:00+00:00")
+    c.settle_replication_grant(1)
+    card = c.get_study_card(1)
+    ov = c.get_lab_overview()
+    assert int(card["bonds_consumed_atto"]) == BOND
+    assert int(ov["open_bonds_atto"]) == 0
+    assert int(ov["endowment_pool_atto"]) == pool_before - BOND
+    # The replicator is owed grant plus bond, but only the grant came out of the
+    # pool book, so the contract native balance sits BOND above the four buckets.
+    summary = c.get_custody_accounting_summary()
+    assert int(summary["credits_outstanding_atto"]) == 10 * E1 + BOND
+
+
+def test_rlt_deposit_has_no_recovery_if_callback_never_lands(direct_deploy, direct_vm, direct_alice):
+    """F-C: one failed token callback bricks the RLT deposit path for everyone."""
+    c = deploy(direct_deploy, direct_vm, direct_alice)
+    direct_vm.sender = direct_alice
+    c.deposit_rlt_custody(E1)
+    # The emitted deposit_into_ledger can revert on allowance or balance, and
+    # nothing but a successful callback clears the pending slot, not time.
+    direct_vm.warp("2027-01-01T00:00:00+00:00")
+    with direct_vm.expect_revert("pending deposit in flight"):
+        c.deposit_rlt_custody(E1)
+    assert int(c.get_custody_accounting_summary()["vault_custody_balance"]) == 0
+
+
+def test_expired_after_challenge_forfeits_challenge_bond(
+    direct_deploy, direct_vm, direct_alice, direct_bob, direct_charlie
+):
+    """F-D: a challenge bond posted before an audit timeout pays nobody."""
+    c = deploy(direct_deploy, direct_vm, direct_alice)
+    mock_pages(direct_vm)
+    mock_audit(direct_vm, 5000)
+    funded_registered(direct_vm, c, direct_alice, direct_bob)
+    direct_vm.sender = direct_alice
+    c.submit_author_response(1, "ok")
+    direct_vm.warp("2026-01-01T00:06:00+00:00")
+    c.evaluate_replication_trial(1)
+    direct_vm.warp("2026-01-01T00:07:00+00:00")
+    direct_vm.sender = direct_charlie
+    direct_vm.value = CHALLENGE_BOND
+    c.challenge_replication_ruling_payable(1, "requesting a re-audit")
+    direct_vm.value = 0
+    direct_vm.warp("2026-01-01T00:11:00+00:00")
+    direct_vm.sender = direct_alice
+    c.claim_unreplicated_or_expired_refund(1)
+    card = c.get_study_card(1)
+    assert card["status"] == "EXPIRED_NO_VALID_REPLICATION"
+    assert int(card["bonds_consumed_atto"]) == BOND + CHALLENGE_BOND
+    # the staked lab is refunded, the challenger is not
+    assert int(c.get_refundable_balance(direct_bob)) == BOND
+    assert int(c.get_refundable_balance(direct_charlie)) == 0

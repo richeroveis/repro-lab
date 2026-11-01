@@ -479,3 +479,37 @@ footer.colophon {
   gap: 1rem;
   flex-wrap: wrap;
 }
+
+.insignia {
+  border: 1px solid var(--edge);
+  border-radius: 14px;
+  image-rendering: auto;
+  background: var(--slate-2);
+}
+
+details.brief {
+  border: 1px solid var(--edge);
+  border-radius: 10px;
+  padding: 0.7rem 0.9rem;
+  margin: 0 0 1.4rem;
+  background: var(--slate-2);
+}
+
+details.brief summary {
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+details.brief video {
+  display: block;
+  width: 100%;
+  max-width: 960px;
+  height: auto;
+  margin-top: 0.8rem;
+  border: 1px solid var(--edge);
+  background: #000;
+}
