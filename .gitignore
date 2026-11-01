@@ -21,8 +21,9 @@ dist/
 *.webm
 *.wav
 
-# Evidence scratch checkpoint (regenerated each run)
+# Evidence scratch checkpoint and run log (regenerated each run)
 evidence/_checkpoint.json
+evidence/_run.log
 
 # Publish helpers (contain nothing, created and removed per run)
 .git-askpass.cmd

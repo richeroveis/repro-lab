@@ -1,0 +1,38 @@
+{
+  "1": {
+    "title": "Sanger Sequencing Read Accuracy Benchmark",
+    "target": "sanger-basecall-accuracy",
+    "pi": "0x154a452b0755EE812014C1405B15D905BA06f9c7",
+    "artifact": "https://richeroveis.github.io/repro-lab/artifacts/sequencing-artifact.html",
+    "log": "https://richeroveis.github.io/repro-lab/artifacts/sequencing-log.html",
+    "baseline_bps": 8250,
+    "endowment_gen": 1
+  },
+  "2": {
+    "title": "LLM Quantization Perplexity Drift Study",
+    "target": "quantization-perplexity-drift",
+    "pi": "0x154a452b0755EE812014C1405B15D905BA06f9c7",
+    "artifact": "https://richeroveis.github.io/repro-lab/artifacts/drift-artifact.html",
+    "log": "https://richeroveis.github.io/repro-lab/artifacts/drift-log.html",
+    "baseline_bps": 5250,
+    "endowment_gen": 1
+  },
+  "3": {
+    "title": "CRISPR Off-Target Cleavage Dataset Benchmark",
+    "target": "crispr-offtarget-cleavage-rate",
+    "pi": "0x154a452b0755EE812014C1405B15D905BA06f9c7",
+    "artifact": "https://richeroveis.github.io/repro-lab/artifacts/crispr-artifact.html",
+    "log": "https://richeroveis.github.io/repro-lab/artifacts/crispr-log.html",
+    "baseline_bps": 6750,
+    "endowment_gen": 1
+  },
+  "4": {
+    "title": "Superconductor Meissner Curve Reproduction",
+    "target": "meissner-flux-expulsion-fraction",
+    "pi": "0x154a452b0755EE812014C1405B15D905BA06f9c7",
+    "artifact": "https://richeroveis.github.io/repro-lab/artifacts/meissner-artifact.html",
+    "log": "https://richeroveis.github.io/repro-lab/artifacts/meissner-log.html",
+    "baseline_bps": 4000,
+    "endowment_gen": 1
+  }
+}
