@@ -1,0 +1,153 @@
+{
+  "1": [
+    {
+      "method": "stake-sequencing-after-close",
+      "hash": "0xf4a9ea01e19f57de45bab6252e57315305a847075ec51b65a120703056f1b3ae",
+      "status_name": "FINALIZED",
+      "result_name": "MAJORITY_AGREE",
+      "exec": "SUCCESS",
+      "votes": "idle,agree,agree,idle,agree",
+      "signer": "0xD58EC569dBa051e6a488d4575998dBAa959b9Cb2",
+      "value_atto": "500000000000000000",
+      "at": "2026-11-01T19:35:12.299Z"
+    }
+  ],
+  "2": [
+    {
+      "method": "stake-drift-labB",
+      "hash": "0x1e2a4c773cdce84c230f7162572af48da20bc733a6b8d08e5c4cc12f15ce4f4d",
+      "status_name": "FINALIZED",
+      "result_name": "MAJORITY_AGREE",
+      "exec": "SUCCESS",
+      "votes": "agree,agree,agree,idle,idle",
+      "signer": "0x6acfDaD89B572a7b3E5e607f40de59001C7c7CBf",
+      "value_atto": "500000000000000000",
+      "at": "2026-11-01T19:30:47.125Z"
+    },
+    {
+      "method": "stake-drift-duplicate",
+      "hash": "0x2fd47bb360658fed839b8e339749edcbacbe4cc7e2db1001b909610dc123b727",
+      "status_name": "FINALIZED",
+      "result_name": "MAJORITY_AGREE",
+      "exec": "SUCCESS",
+      "votes": "agree,agree,agree,idle,idle",
+      "signer": "0x6acfDaD89B572a7b3E5e607f40de59001C7c7CBf",
+      "value_atto": "500000000000000000",
+      "at": "2026-11-01T19:32:38.299Z"
+    },
+    {
+      "method": "author-response-drift",
+      "hash": "0x09089c8d96326328d5b48ae5adfcc53a2f0d3a913ef4540e41bf491667258df2",
+      "status_name": "FINALIZED",
+      "result_name": "MAJORITY_AGREE",
+      "exec": "SUCCESS",
+      "votes": "agree,idle,agree,agree,idle",
+      "signer": "0x154a452b0755EE812014C1405B15D905BA06f9c7",
+      "value_atto": "0",
+      "at": "2026-11-01T19:33:15.211Z"
+    },
+    {
+      "method": "evaluate-drift",
+      "hash": "0x5892c56f79d6d1b3883be51d0588b2820a23f4b91e7ab2010e0146ffddcb403b",
+      "status_name": "FINALIZED",
+      "result_name": "MAJORITY_AGREE",
+      "exec": "SUCCESS",
+      "votes": "agree,agree,idle,agree,idle",
+      "signer": "0x154a452b0755EE812014C1405B15D905BA06f9c7",
+      "value_atto": "0",
+      "at": "2026-11-01T19:37:28.298Z"
+    },
+    {
+      "method": "settle-drift",
+      "hash": "0x8a63f51e76b265d53efe11ca32077847b27b5307490d8a7d7e4016f2156d95df",
+      "status_name": "FINALIZED",
+      "result_name": "MAJORITY_AGREE",
+      "exec": "SUCCESS",
+      "votes": "idle,idle,agree,agree,agree",
+      "signer": "0x154a452b0755EE812014C1405B15D905BA06f9c7",
+      "value_atto": "0",
+      "at": "2026-11-01T19:40:09.173Z"
+    }
+  ],
+  "3": [
+    {
+      "method": "stake-crispr-labC",
+      "hash": "0xa0edf5288b8e7ceb766ec5596b02a11917dbab404dea9784bddc864600ebccc1",
+      "status_name": "FINALIZED",
+      "result_name": "MAJORITY_AGREE",
+      "exec": "SUCCESS",
+      "votes": "idle,agree,agree,agree,idle",
+      "signer": "0xD58EC569dBa051e6a488d4575998dBAa959b9Cb2",
+      "value_atto": "500000000000000000",
+      "at": "2026-11-01T19:31:24.055Z"
+    },
+    {
+      "method": "author-response-crispr",
+      "hash": "0xb06a959f36243fe5f7e4b7d12aaafe538eba765e2f96456aacf9b46bacda67d8",
+      "status_name": "FINALIZED",
+      "result_name": "MAJORITY_AGREE",
+      "exec": "SUCCESS",
+      "votes": "idle,idle,agree,agree,agree",
+      "signer": "0x154a452b0755EE812014C1405B15D905BA06f9c7",
+      "value_atto": "0",
+      "at": "2026-11-01T19:33:53.330Z"
+    },
+    {
+      "method": "challenge-crispr-labB",
+      "hash": "0x0c0ad1b8ecf8df0fcad949a01f4c3e47f2e97e442a3f5073f098518a489db7fa",
+      "status_name": "FINALIZED",
+      "result_name": "MAJORITY_AGREE",
+      "exec": "SUCCESS",
+      "votes": "agree,agree,idle,agree,agree",
+      "signer": "0x6acfDaD89B572a7b3E5e607f40de59001C7c7CBf",
+      "value_atto": "1000000000000000000",
+      "at": "2026-11-01T19:39:27.320Z"
+    },
+    {
+      "method": "reevaluate-crispr",
+      "hash": "0x4c8e125d9215eadb5a665665b88f4b02751c5e1f72ce5eefbc6592cfc51155ae",
+      "status_name": "FINALIZED",
+      "result_name": "MAJORITY_AGREE",
+      "exec": "SUCCESS",
+      "votes": "agree,idle,agree,idle,agree",
+      "signer": "0x154a452b0755EE812014C1405B15D905BA06f9c7",
+      "value_atto": "0",
+      "at": "2026-11-01T19:45:03.953Z"
+    },
+    {
+      "method": "settle-crispr",
+      "hash": "0x3c4c064117ce287b5f8ef6e24caae4ae53e6ff280f7040459f5acb3f0e45858f",
+      "status_name": "FINALIZED",
+      "result_name": "MAJORITY_AGREE",
+      "exec": "SUCCESS",
+      "votes": "idle,idle,agree,agree,agree",
+      "signer": "0x154a452b0755EE812014C1405B15D905BA06f9c7",
+      "value_atto": "0",
+      "at": "2026-11-01T19:46:42.140Z"
+    }
+  ],
+  "4": [
+    {
+      "method": "stake-meissner-labB",
+      "hash": "0xe854c2b665a4bbe5b9994e1facbdb0428067cec2cd4b31a8d0c763d132a3e7d3",
+      "status_name": "FINALIZED",
+      "result_name": "MAJORITY_AGREE",
+      "exec": "SUCCESS",
+      "votes": "agree,agree,idle,agree,agree",
+      "signer": "0x6acfDaD89B572a7b3E5e607f40de59001C7c7CBf",
+      "value_atto": "500000000000000000",
+      "at": "2026-11-01T19:32:01.353Z"
+    },
+    {
+      "method": "expired-refund-meissner",
+      "hash": "0xaca07fce1633be007adf83d2f5ccbf40856131bed056710096847f23704ad9cb",
+      "status_name": "FINALIZED",
+      "result_name": "MAJORITY_AGREE",
+      "exec": "SUCCESS",
+      "votes": "idle,idle,agree,agree,agree",
+      "signer": "0x154a452b0755EE812014C1405B15D905BA06f9c7",
+      "value_atto": "0",
+      "at": "2026-11-01T19:43:50.247Z"
+    }
+  ]
+}

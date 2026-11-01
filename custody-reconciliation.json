@@ -1,0 +1,14 @@
+{
+  "generated_at": "2026-11-01T20:32:11.131Z",
+  "ledger": "0xdC4D683437C797438b0F96bA526101286111d9eB",
+  "rlt_token": "0xbc813AF4E82072b063e5a925FdFAdf721a62800e",
+  "inbound_native_atto": "21200000000000000000",
+  "external_payouts_atto": "9200000000000000000",
+  "ledger_gen_atto": "12000000000000000000",
+  "liabilities_atto": "10500000000000000000",
+  "custodial_surplus_atto": "1500000000000000000",
+  "flow_reconciles": true,
+  "solvent": true,
+  "reserve_covers": true,
+  "credits_outstanding_atto": "0"
+}
