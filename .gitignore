@@ -24,6 +24,10 @@ dist/
 # Evidence scratch checkpoint (regenerated each run)
 evidence/_checkpoint.json
 
+# Publish helpers (contain nothing, created and removed per run)
+.git-askpass.cmd
+.gh-pages-work/
+
 # OS / editor noise
 .DS_Store
 Thumbs.db
