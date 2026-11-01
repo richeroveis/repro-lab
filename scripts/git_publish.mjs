@@ -5,7 +5,8 @@
 // usage:
 //   node scripts/git_publish.mjs main        # push the current branch
 //   node scripts/git_publish.mjs gh-pages    # push frontend/dist as gh-pages
-//   node scripts/git_publish.mjs both
+//   node scripts/git_publish.mjs tags        # push local tags
+//   node scripts/git_publish.mjs both        # main plus gh-pages
 
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -71,6 +72,20 @@ function pushGhPages() {
   }
 }
 
+function pushTags() {
+  const listing = execFileSync('git', ['tag', '--list'], { encoding: 'utf8' }).trim();
+  const tags = listing ? listing.split(/\r?\n/) : [];
+  if (tags.length === 0) {
+    console.log('no local tags to push');
+    return;
+  }
+  for (const tag of tags) {
+    git(['push', '--force', REPO, `refs/tags/${tag}:refs/tags/${tag}`]);
+    console.log('pushed tag', tag);
+  }
+}
+
 const what = process.argv[2] || 'both';
 if (what === 'main' || what === 'both') pushBranch();
 if (what === 'gh-pages' || what === 'both') pushGhPages();
+if (what === 'tags' || what === 'both') pushTags();
