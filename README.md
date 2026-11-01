@@ -24,6 +24,24 @@ Live site: https://richeroveis.github.io/repro-lab/
 | Deployment guide | [docs/deployment.md](docs/deployment.md) |
 | Demo brief | [docs/demo-video-subtitled.mp4](docs/demo-video-subtitled.mp4), 50 s, subtitled, with audio |
 
+### Deployment provenance
+
+The deployed pair is frozen. It came from this commit and nothing in it changed
+afterwards, which is what the four way identity check proves.
+
+| item | value |
+| --- | --- |
+| Deployed commit | `5413ae6de3662a8d3849c8727d2e06a6fc387976`, tagged `studionet-v1` |
+| Ledger deploy tx | `0xd578c7c292c9f4e190c89f75498376c31caa1dd71027841310737c541f0faf15`, FINALIZED, MAJORITY_AGREE, leader SUCCESS |
+| RLT deploy tx | `0x72361c8eda984a9b53c8c1434d72c69ae04b4adc6d40a669b29b73fe110ea8ca`, FINALIZED, MAJORITY_AGREE, leader SUCCESS |
+| `contracts/repro_lab.py` sha256 | `aae87959b8da96073cebfb0bb888da0299e1f05daa05864547dd52b1673a6a65`, 37,497 bytes |
+| `contracts/rlt_token.py` sha256 | `9fc8b49f3b9ed0493d390018908cc6f36959a12f2e0cd471eb31fee5368aa7d7`, 4,173 bytes |
+
+Reproduce with `node scripts/verify_source_identity.mjs all`, which requires the
+local file, the git blob, the GitHub raw file and the code the network returns for
+the deployed address to hash identically. Current result: `fourWayIdentical: true`
+for both contracts, recorded in `evidence/identity.txt`.
+
 ## Where the boundary sits
 
 **Frontend owns:** the notebook UI, the burner lab wallet, the workbench that
@@ -57,12 +75,14 @@ them.
    had to match, the challenge and re evaluation history, and the countdowns for
    trial close, rebuttal, audit timeout and the peer challenge window.
 
-The page issues at most three read calls on first load (`get_lab_overview`,
-`get_reproducibility_index`, `get_custody_accounting_summary`) plus one card read
-when a study is selected. The studionet RPC does not send CORS headers, so a page
-served from GitHub Pages falls back to `frontend/public/snapshot.json`, which the
-driver regenerates from chain after every run. The UI always stamps which mode it
-is in, live read or published snapshot.
+The page issues three read calls on first load (`get_lab_overview`,
+`get_reproducibility_index`, `get_custody_accounting_summary`), which is inside the
+four call budget, then two more when a study is selected (`get_study_card` and
+`get_trial_book`). Selecting a study is a user action, not part of the first
+paint. The studionet RPC does not send CORS headers, so a page served from GitHub
+Pages falls back to `frontend/public/snapshot.json`, which the driver regenerates
+from chain after every run. The UI always stamps which mode it is in, live read or
+published snapshot.
 
 ## Lifecycle, as it ran on chain
 
@@ -83,13 +103,21 @@ party self challenge.
 ## Running the code
 
 ```bash
-python -m genvm_lint check contracts/repro_lab.py
+genvm-lint check contracts/repro_lab.py
+genvm-lint check contracts/rlt_token.py
 python -m pytest tests/ -q
 node scripts/run_studionet_lifecycle.mjs deploy
 node scripts/run_studionet_lifecycle.mjs verify,report
 python scripts/verify_explorer_txs.py
-python scripts/verify_source_identity.mjs all
+node scripts/verify_source_identity.mjs all
+python scripts/verify_published_site.py
+python scripts/check_no_secrets.py
 ```
+
+GitHub Actions runs the runner pin check, the 37,500 byte budget, the LF check and
+the direct mode suite on every push that touches `contracts/`, `tests/` or the
+workflow. The GenVM linter is a local binary, so linting stays a local gate and
+its output is recorded in [docs/deployment.md](docs/deployment.md).
 
 Frontend:
 
@@ -110,7 +138,7 @@ faucet.
 ## Known findings, stated plainly
 
 [docs/adversarial-review.md](docs/adversarial-review.md) lists nine findings with
-the test that pins each one. Four are OPEN and none of them locks a user out of
+the test that pins each one. Five are OPEN, and none of them locks a user out of
 their own money:
 
 - a challenger's bond is paid to the replicator at settlement instead of back to
@@ -120,6 +148,8 @@ their own money:
   that no method can sweep, in the over custody direction, so nobody is shorted
 - one failed RLT deposit callback blocks the RLT deposit path for everyone, with
   no time based recovery
+- the custody summary view omits open bonds, so liabilities have to be summed
+  across two views, which is cosmetic
 
 They are left unfixed because this release must point at the exact contract pair
 that the evidence and the four way source identity check describe, and each fix
