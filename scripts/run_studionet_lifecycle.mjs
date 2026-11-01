@@ -863,7 +863,7 @@ async function main() {
     'verify',
     'report',
   ];
-  const run = name === 'all' ? order : [name];
+  const run = name === 'all' ? order : name.split(',').map((s) => s.trim()).filter(Boolean);
   for (const step of run) {
     const fn = STEPS[step];
     if (!fn) {

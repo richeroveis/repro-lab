@@ -1,0 +1,62 @@
+GenLayer RPC error (gen_getContractCode): (psycopg2.ProgrammingError) can't adapt type 'dict'
+[SQL: SELECT jsonb_typeof(current_state.data) AS data_kind, jsonb_typeof(current_state.data[%(data_1)s]) AS state_kind, (current_state.data[%(data_2)s][%(param_1)s]) ->> %(param_2)s AS nested, (current_state.data[%(data_3)s]) ->> %(param_3)s AS flat 
+FROM current_state 
+WHERE current_state.id = %(id_1)s]
+[parameters: {'data_1': 'state', 'data_2': 'state', 'param_1': 'accepted', 'param_2': '4a4jQSeS32tqmPt8mDlwH7iwK2/H7QIoEPeDRklGhec=', 'data_3': 'state', 'param_3': '4a4jQSeS32tqmPt8mDlwH7iwK2/H7QIoEPeDRklGhec=', 'id_1': {'address': '0xdC4D683437C797438b0F96bA526101286111d9eB'}}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+GenLayer RPC error (gen_getContractCode): Too many parameters provided
+GenLayer RPC error (gen_getContractCode): (psycopg2.ProgrammingError) can't adapt type 'dict'
+[SQL: SELECT jsonb_typeof(current_state.data) AS data_kind, jsonb_typeof(current_state.data[%(data_1)s]) AS state_kind, (current_state.data[%(data_2)s][%(param_1)s]) ->> %(param_2)s AS nested, (current_state.data[%(data_3)s]) ->> %(param_3)s AS flat 
+FROM current_state 
+WHERE current_state.id = %(id_1)s]
+[parameters: {'data_1': 'state', 'data_2': 'state', 'param_1': 'accepted', 'param_2': '4a4jQSeS32tqmPt8mDlwH7iwK2/H7QIoEPeDRklGhec=', 'data_3': 'state', 'param_3': '4a4jQSeS32tqmPt8mDlwH7iwK2/H7QIoEPeDRklGhec=', 'id_1': {'contract_address': '0xdC4D683437C797438b0F96bA526101286111d9eB'}}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+{
+  "file": "contracts/repro_lab.py",
+  "address": "0xdC4D683437C797438b0F96bA526101286111d9eB",
+  "hashes": {
+    "local": "aae87959b8da96073cebfb0bb888da0299e1f05daa05864547dd52b1673a6a65",
+    "gitBlob": "aae87959b8da96073cebfb0bb888da0299e1f05daa05864547dd52b1673a6a65",
+    "githubRaw": "aae87959b8da96073cebfb0bb888da0299e1f05daa05864547dd52b1673a6a65",
+    "onChain": "aae87959b8da96073cebfb0bb888da0299e1f05daa05864547dd52b1673a6a65"
+  },
+  "sizes": {
+    "local": 37497,
+    "gitBlob": 37497,
+    "githubRaw": 37497,
+    "onChain": 37497
+  },
+  "fourWayIdentical": true
+}
+(node:17360) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+GenLayer RPC error (gen_getContractCode): (psycopg2.ProgrammingError) can't adapt type 'dict'
+[SQL: SELECT jsonb_typeof(current_state.data) AS data_kind, jsonb_typeof(current_state.data[%(data_1)s]) AS state_kind, (current_state.data[%(data_2)s][%(param_1)s]) ->> %(param_2)s AS nested, (current_state.data[%(data_3)s]) ->> %(param_3)s AS flat 
+FROM current_state 
+WHERE current_state.id = %(id_1)s]
+[parameters: {'data_1': 'state', 'data_2': 'state', 'param_1': 'accepted', 'param_2': '4a4jQSeS32tqmPt8mDlwH7iwK2/H7QIoEPeDRklGhec=', 'data_3': 'state', 'param_3': '4a4jQSeS32tqmPt8mDlwH7iwK2/H7QIoEPeDRklGhec=', 'id_1': {'address': '0xbc813AF4E82072b063e5a925FdFAdf721a62800e'}}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+GenLayer RPC error (gen_getContractCode): Too many parameters provided
+GenLayer RPC error (gen_getContractCode): (psycopg2.ProgrammingError) can't adapt type 'dict'
+[SQL: SELECT jsonb_typeof(current_state.data) AS data_kind, jsonb_typeof(current_state.data[%(data_1)s]) AS state_kind, (current_state.data[%(data_2)s][%(param_1)s]) ->> %(param_2)s AS nested, (current_state.data[%(data_3)s]) ->> %(param_3)s AS flat 
+FROM current_state 
+WHERE current_state.id = %(id_1)s]
+[parameters: {'data_1': 'state', 'data_2': 'state', 'param_1': 'accepted', 'param_2': '4a4jQSeS32tqmPt8mDlwH7iwK2/H7QIoEPeDRklGhec=', 'data_3': 'state', 'param_3': '4a4jQSeS32tqmPt8mDlwH7iwK2/H7QIoEPeDRklGhec=', 'id_1': {'contract_address': '0xbc813AF4E82072b063e5a925FdFAdf721a62800e'}}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+{
+  "file": "contracts/rlt_token.py",
+  "address": "0xbc813AF4E82072b063e5a925FdFAdf721a62800e",
+  "hashes": {
+    "local": "9fc8b49f3b9ed0493d390018908cc6f36959a12f2e0cd471eb31fee5368aa7d7",
+    "gitBlob": "9fc8b49f3b9ed0493d390018908cc6f36959a12f2e0cd471eb31fee5368aa7d7",
+    "githubRaw": "9fc8b49f3b9ed0493d390018908cc6f36959a12f2e0cd471eb31fee5368aa7d7",
+    "onChain": "9fc8b49f3b9ed0493d390018908cc6f36959a12f2e0cd471eb31fee5368aa7d7"
+  },
+  "sizes": {
+    "local": 4173,
+    "gitBlob": 4173,
+    "githubRaw": 4173,
+    "onChain": 4173
+  },
+  "fourWayIdentical": true
+}
