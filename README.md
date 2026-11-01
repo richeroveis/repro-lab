@@ -31,7 +31,8 @@ afterwards, which is what the four way identity check proves.
 
 | item | value |
 | --- | --- |
-| Deployed commit | `5413ae6de3662a8d3849c8727d2e06a6fc387976`, tagged `studionet-v1` |
+| Deployed source commit | `5413ae6de3662a8d3849c8727d2e06a6fc387976` |
+| Release tag | `studionet-v1` at the final `main` HEAD; the contract files there are byte identical to the deployed source |
 | Ledger deploy tx | `0xd578c7c292c9f4e190c89f75498376c31caa1dd71027841310737c541f0faf15`, FINALIZED, MAJORITY_AGREE, leader SUCCESS |
 | RLT deploy tx | `0x72361c8eda984a9b53c8c1434d72c69ae04b4adc6d40a669b29b73fe110ea8ca`, FINALIZED, MAJORITY_AGREE, leader SUCCESS |
 | `contracts/repro_lab.py` sha256 | `aae87959b8da96073cebfb0bb888da0299e1f05daa05864547dd52b1673a6a65`, 37,497 bytes |
