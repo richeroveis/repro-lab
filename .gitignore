@@ -27,6 +27,7 @@ evidence/_run.log
 evidence/_verify2.log
 evidence/_lint1.txt
 evidence/_lint2.txt
+evidence/_ci.log
 
 # Generated media scratch (video frames, wav beds); final mp4 and png are tracked
 build/
