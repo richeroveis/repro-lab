@@ -1,0 +1,515 @@
+contract gates | run_number 2 | event push | head_sha d8715ec0 | status completed | conclusion failure
+pages build and deployment | run_number 3 | event dynamic | head_sha 5bc82db6 | status completed | conclusion success
+contract gates | run_number 1 | event push | head_sha d8715ec0 | status completed | conclusion failure
+  job direct-tests: status completed conclusion failure
+    - Set up job: success
+    - Run actions/checkout@v4: success
+    - Run actions/setup-python@v5: success
+    - Install the GenLayer test harness: success
+    - Check the pinned runner and the byte budget: success
+    - Run the direct mode suite: failure
+    - Post Run actions/setup-python@v5: skipped
+    - Post Run actions/checkout@v4: success
+    - Complete job: success
+  ---- last log lines ----
+2026-11-01T21:33:27.8626173Z     setup_sdk_paths(contract_path, sdk_version)
+2026-11-01T21:33:27.8626476Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/sdk_loader.py:214: in setup_sdk_paths
+2026-11-01T21:33:27.8626635Z     tarball = download_artifacts(version)
+2026-11-01T21:33:27.8626724Z               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8627049Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/sdk_loader.py:90: in download_artifacts
+2026-11-01T21:33:27.8627197Z     with urllib.request.urlopen(req, timeout=300) as resp:
+2026-11-01T21:33:27.8627338Z          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8627567Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:215: in urlopen
+2026-11-01T21:33:27.8627671Z     return opener.open(url, data, timeout)
+2026-11-01T21:33:27.8627766Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8628048Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:521: in open
+2026-11-01T21:33:27.8628160Z     response = meth(req, response)
+2026-11-01T21:33:27.8628250Z                ^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8628481Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:630: in http_response
+2026-11-01T21:33:27.8628589Z     response = self.parent.error(
+2026-11-01T21:33:27.8628790Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:559: in error
+2026-11-01T21:33:27.8628888Z     return self._call_chain(*args)
+2026-11-01T21:33:27.8628971Z            ^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8629201Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:492: in _call_chain
+2026-11-01T21:33:27.8629294Z     result = func(*args)
+2026-11-01T21:33:27.8629377Z              ^^^^^^^^^^^
+2026-11-01T21:33:27.8629510Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-11-01T21:33:27.8629515Z 
+2026-11-01T21:33:27.8629706Z self = <urllib.request.HTTPDefaultErrorHandler object at 0x7fce189f1f40>
+2026-11-01T21:33:27.8629852Z req = <urllib.request.Request object at 0x7fce18a70bc0>
+2026-11-01T21:33:27.8630023Z fp = <http.client.HTTPResponse object at 0x7fce184d06d0>, code = 404
+2026-11-01T21:33:27.8630203Z msg = 'Not Found', hdrs = <http.client.HTTPMessage object at 0x7fce184834d0>
+2026-11-01T21:33:27.8630208Z 
+2026-11-01T21:33:27.8630349Z     def http_error_default(self, req, fp, code, msg, hdrs):
+2026-11-01T21:33:27.8630480Z >       raise HTTPError(req.full_url, code, msg, hdrs, fp)
+2026-11-01T21:33:27.8630621Z E       urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8630630Z 
+2026-11-01T21:33:27.8630844Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:639: HTTPError
+2026-11-01T21:33:27.8631006Z ----------------------------- Captured stdout call -----------------------------
+2026-11-01T21:33:27.8631296Z Downloading https://github.com/genlayerlabs/genvm/releases/download/v0.3.0-rc7/genvm-universal.tar.xz...
+2026-11-01T21:33:27.8631459Z ______________________ test_deposit_positive_amount_only _______________________
+2026-11-01T21:33:27.8631464Z 
+2026-11-01T21:33:27.8631652Z direct_deploy = <function direct_deploy.<locals>._deploy at 0x7fce183318a0>
+2026-11-01T21:33:27.8632243Z direct_vm = VMContext(_sender=b'+\xd8\x06\xc9\x7f\x0e\x00\xaf\x1a\x1f\xc32\x8f\xa7c\xa9&\x97#\xc8', _origin=b'+\xd8\x06\xc9\x7f\x0...m_mocks_hit=set(), _live_web_handler=None, _live_llm_handler=None, _gl_call_hook=None, _traces=[], _trace_enabled=True)
+2026-11-01T21:33:27.8632424Z direct_alice = b'+\xd8\x06\xc9\x7f\x0e\x00\xaf\x1a\x1f\xc32\x8f\xa7c\xa9&\x97#\xc8'
+2026-11-01T21:33:27.8632611Z direct_bob = b'\x81\xb67\xd8\xfc\xd2\xc6\xdacY\xe6\x961\x13\xa1\x17\r\xe7\x95\xe4'
+2026-11-01T21:33:27.8632616Z 
+2026-11-01T21:33:27.8632842Z     def test_deposit_positive_amount_only(direct_deploy, direct_vm, direct_alice, direct_bob):
+2026-11-01T21:33:27.8632990Z >       t = deploy_token(direct_deploy, direct_vm, direct_alice)
+2026-11-01T21:33:27.8633103Z             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8633108Z 
+2026-11-01T21:33:27.8633205Z tests/test_rlt_token_direct.py:88: 
+2026-11-01T21:33:27.8633341Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-11-01T21:33:27.8633599Z tests/test_rlt_token_direct.py:17: in deploy_token
+2026-11-01T21:33:27.8633705Z     return direct_deploy(TOKEN)
+2026-11-01T21:33:27.8633797Z            ^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8634107Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/pytest_plugin.py:70: in _deploy
+2026-11-01T21:33:27.8634371Z     return deploy_contract(path, direct_vm, *args, sdk_version=sdk_version, **kwargs)
+2026-11-01T21:33:27.8634488Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8634782Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/loader.py:80: in deploy_contract
+2026-11-01T21:33:27.8634946Z     contract_cls = load_contract_class(contract_path, vm, sdk_version)
+2026-11-01T21:33:27.8635062Z                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8635371Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/loader.py:47: in load_contract_class
+2026-11-01T21:33:27.8635488Z     setup_sdk_paths(contract_path, sdk_version)
+2026-11-01T21:33:27.8635801Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/sdk_loader.py:214: in setup_sdk_paths
+2026-11-01T21:33:27.8635902Z     tarball = download_artifacts(version)
+2026-11-01T21:33:27.8635999Z               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8636327Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/sdk_loader.py:90: in download_artifacts
+2026-11-01T21:33:27.8636466Z     with urllib.request.urlopen(req, timeout=300) as resp:
+2026-11-01T21:33:27.8636570Z          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8636783Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:215: in urlopen
+2026-11-01T21:33:27.8636897Z     return opener.open(url, data, timeout)
+2026-11-01T21:33:27.8636990Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8637190Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:521: in open
+2026-11-01T21:33:27.8637292Z     response = meth(req, response)
+2026-11-01T21:33:27.8637378Z                ^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8637610Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:630: in http_response
+2026-11-01T21:33:27.8637713Z     response = self.parent.error(
+2026-11-01T21:33:27.8638037Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:559: in error
+2026-11-01T21:33:27.8638149Z     return self._call_chain(*args)
+2026-11-01T21:33:27.8638233Z            ^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8638462Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:492: in _call_chain
+2026-11-01T21:33:27.8638548Z     result = func(*args)
+2026-11-01T21:33:27.8638636Z              ^^^^^^^^^^^
+2026-11-01T21:33:27.8638764Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-11-01T21:33:27.8638769Z 
+2026-11-01T21:33:27.8638975Z self = <urllib.request.HTTPDefaultErrorHandler object at 0x7fce189f1f40>
+2026-11-01T21:33:27.8639122Z req = <urllib.request.Request object at 0x7fce18d00ef0>
+2026-11-01T21:33:27.8639288Z fp = <http.client.HTTPResponse object at 0x7fce1842f7c0>, code = 404
+2026-11-01T21:33:27.8639474Z msg = 'Not Found', hdrs = <http.client.HTTPMessage object at 0x7fce1842edb0>
+2026-11-01T21:33:27.8639483Z 
+2026-11-01T21:33:27.8639623Z     def http_error_default(self, req, fp, code, msg, hdrs):
+2026-11-01T21:33:27.8639766Z >       raise HTTPError(req.full_url, code, msg, hdrs, fp)
+2026-11-01T21:33:27.8639906Z E       urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8639911Z 
+2026-11-01T21:33:27.8640117Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:639: HTTPError
+2026-11-01T21:33:27.8640298Z ----------------------------- Captured stdout call -----------------------------
+2026-11-01T21:33:27.8640634Z Downloading https://github.com/genlayerlabs/genvm/releases/download/v0.3.0-rc7/genvm-universal.tar.xz...
+2026-11-01T21:33:27.8640815Z _______________ test_deposit_credits_ledger_and_spend_allowance ________________
+2026-11-01T21:33:27.8640821Z 
+2026-11-01T21:33:27.8641011Z direct_deploy = <function direct_deploy.<locals>._deploy at 0x7fce18331bc0>
+2026-11-01T21:33:27.8641644Z direct_vm = VMContext(_sender=b'+\xd8\x06\xc9\x7f\x0e\x00\xaf\x1a\x1f\xc32\x8f\xa7c\xa9&\x97#\xc8', _origin=b'+\xd8\x06\xc9\x7f\x0...m_mocks_hit=set(), _live_web_handler=None, _live_llm_handler=None, _gl_call_hook=None, _traces=[], _trace_enabled=True)
+2026-11-01T21:33:27.8641830Z direct_alice = b'+\xd8\x06\xc9\x7f\x0e\x00\xaf\x1a\x1f\xc32\x8f\xa7c\xa9&\x97#\xc8'
+2026-11-01T21:33:27.8642007Z direct_bob = b'\x81\xb67\xd8\xfc\xd2\xc6\xdacY\xe6\x961\x13\xa1\x17\r\xe7\x95\xe4'
+2026-11-01T21:33:27.8642019Z 
+2026-11-01T21:33:27.8642150Z     def test_deposit_credits_ledger_and_spend_allowance(
+2026-11-01T21:33:27.8642282Z         direct_deploy, direct_vm, direct_alice, direct_bob
+2026-11-01T21:33:27.8642359Z     ):
+2026-11-01T21:33:27.8642500Z >       t = deploy_token(direct_deploy, direct_vm, direct_alice)
+2026-11-01T21:33:27.8642601Z             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8642606Z 
+2026-11-01T21:33:27.8642711Z tests/test_rlt_token_direct.py:97: 
+2026-11-01T21:33:27.8642845Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-11-01T21:33:27.8642964Z tests/test_rlt_token_direct.py:17: in deploy_token
+2026-11-01T21:33:27.8643060Z     return direct_deploy(TOKEN)
+2026-11-01T21:33:27.8643140Z            ^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8643428Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/pytest_plugin.py:70: in _deploy
+2026-11-01T21:33:27.8643616Z     return deploy_contract(path, direct_vm, *args, sdk_version=sdk_version, **kwargs)
+2026-11-01T21:33:27.8643736Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8644029Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/loader.py:80: in deploy_contract
+2026-11-01T21:33:27.8644186Z     contract_cls = load_contract_class(contract_path, vm, sdk_version)
+2026-11-01T21:33:27.8644299Z                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8644589Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/loader.py:47: in load_contract_class
+2026-11-01T21:33:27.8644710Z     setup_sdk_paths(contract_path, sdk_version)
+2026-11-01T21:33:27.8645004Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/sdk_loader.py:214: in setup_sdk_paths
+2026-11-01T21:33:27.8645106Z     tarball = download_artifacts(version)
+2026-11-01T21:33:27.8645199Z               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8645498Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/sdk_loader.py:90: in download_artifacts
+2026-11-01T21:33:27.8645643Z     with urllib.request.urlopen(req, timeout=300) as resp:
+2026-11-01T21:33:27.8645743Z          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8645946Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:215: in urlopen
+2026-11-01T21:33:27.8646056Z     return opener.open(url, data, timeout)
+2026-11-01T21:33:27.8646147Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8646346Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:521: in open
+2026-11-01T21:33:27.8646440Z     response = meth(req, response)
+2026-11-01T21:33:27.8646530Z                ^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8646755Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:630: in http_response
+2026-11-01T21:33:27.8646852Z     response = self.parent.error(
+2026-11-01T21:33:27.8647056Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:559: in error
+2026-11-01T21:33:27.8647148Z     return self._call_chain(*args)
+2026-11-01T21:33:27.8647283Z            ^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8647502Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:492: in _call_chain
+2026-11-01T21:33:27.8647601Z     result = func(*args)
+2026-11-01T21:33:27.8647692Z              ^^^^^^^^^^^
+2026-11-01T21:33:27.8647894Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-11-01T21:33:27.8647963Z 
+2026-11-01T21:33:27.8648175Z self = <urllib.request.HTTPDefaultErrorHandler object at 0x7fce189f1f40>
+2026-11-01T21:33:27.8648315Z req = <urllib.request.Request object at 0x7fce18a748f0>
+2026-11-01T21:33:27.8648492Z fp = <http.client.HTTPResponse object at 0x7fce1842d270>, code = 404
+2026-11-01T21:33:27.8648675Z msg = 'Not Found', hdrs = <http.client.HTTPMessage object at 0x7fce1842ffe0>
+2026-11-01T21:33:27.8648680Z 
+2026-11-01T21:33:27.8648817Z     def http_error_default(self, req, fp, code, msg, hdrs):
+2026-11-01T21:33:27.8648956Z >       raise HTTPError(req.full_url, code, msg, hdrs, fp)
+2026-11-01T21:33:27.8649093Z E       urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8649098Z 
+2026-11-01T21:33:27.8649316Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:639: HTTPError
+2026-11-01T21:33:27.8649489Z ----------------------------- Captured stdout call -----------------------------
+2026-11-01T21:33:27.8649780Z Downloading https://github.com/genlayerlabs/genvm/releases/download/v0.3.0-rc7/genvm-universal.tar.xz...
+2026-11-01T21:33:27.8649958Z ____________________ test_deposit_exceeding_balance_reverts ____________________
+2026-11-01T21:33:27.8649963Z 
+2026-11-01T21:33:27.8650145Z direct_deploy = <function direct_deploy.<locals>._deploy at 0x7fce18331580>
+2026-11-01T21:33:27.8650752Z direct_vm = VMContext(_sender=b'+\xd8\x06\xc9\x7f\x0e\x00\xaf\x1a\x1f\xc32\x8f\xa7c\xa9&\x97#\xc8', _origin=b'+\xd8\x06\xc9\x7f\x0...m_mocks_hit=set(), _live_web_handler=None, _live_llm_handler=None, _gl_call_hook=None, _traces=[], _trace_enabled=True)
+2026-11-01T21:33:27.8650947Z direct_alice = b'+\xd8\x06\xc9\x7f\x0e\x00\xaf\x1a\x1f\xc32\x8f\xa7c\xa9&\x97#\xc8'
+2026-11-01T21:33:27.8651127Z direct_bob = b'\x81\xb67\xd8\xfc\xd2\xc6\xdacY\xe6\x961\x13\xa1\x17\r\xe7\x95\xe4'
+2026-11-01T21:33:27.8651132Z 
+2026-11-01T21:33:27.8651254Z     def test_deposit_exceeding_balance_reverts(
+2026-11-01T21:33:27.8651386Z         direct_deploy, direct_vm, direct_alice, direct_bob
+2026-11-01T21:33:27.8651477Z     ):
+2026-11-01T21:33:27.8651626Z >       t = deploy_token(direct_deploy, direct_vm, direct_alice)
+2026-11-01T21:33:27.8651729Z             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8651734Z 
+2026-11-01T21:33:27.8651843Z tests/test_rlt_token_direct.py:108: 
+2026-11-01T21:33:27.8651975Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-11-01T21:33:27.8652104Z tests/test_rlt_token_direct.py:17: in deploy_token
+2026-11-01T21:33:27.8652199Z     return direct_deploy(TOKEN)
+2026-11-01T21:33:27.8652293Z            ^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8652609Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/pytest_plugin.py:70: in _deploy
+2026-11-01T21:33:27.8652814Z     return deploy_contract(path, direct_vm, *args, sdk_version=sdk_version, **kwargs)
+2026-11-01T21:33:27.8652943Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8653248Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/loader.py:80: in deploy_contract
+2026-11-01T21:33:27.8653425Z     contract_cls = load_contract_class(contract_path, vm, sdk_version)
+2026-11-01T21:33:27.8653543Z                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8653851Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/loader.py:47: in load_contract_class
+2026-11-01T21:33:27.8653980Z     setup_sdk_paths(contract_path, sdk_version)
+2026-11-01T21:33:27.8654344Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/sdk_loader.py:214: in setup_sdk_paths
+2026-11-01T21:33:27.8654463Z     tarball = download_artifacts(version)
+2026-11-01T21:33:27.8654557Z               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8654889Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/sdk_loader.py:90: in download_artifacts
+2026-11-01T21:33:27.8655085Z     with urllib.request.urlopen(req, timeout=300) as resp:
+2026-11-01T21:33:27.8655183Z          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8655417Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:215: in urlopen
+2026-11-01T21:33:27.8655520Z     return opener.open(url, data, timeout)
+2026-11-01T21:33:27.8655615Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8655822Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:521: in open
+2026-11-01T21:33:27.8655918Z     response = meth(req, response)
+2026-11-01T21:33:27.8656008Z                ^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8656235Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:630: in http_response
+2026-11-01T21:33:27.8656343Z     response = self.parent.error(
+2026-11-01T21:33:27.8656545Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:559: in error
+2026-11-01T21:33:27.8656647Z     return self._call_chain(*args)
+2026-11-01T21:33:27.8656731Z            ^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8656951Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:492: in _call_chain
+2026-11-01T21:33:27.8657042Z     result = func(*args)
+2026-11-01T21:33:27.8657122Z              ^^^^^^^^^^^
+2026-11-01T21:33:27.8657259Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-11-01T21:33:27.8657264Z 
+2026-11-01T21:33:27.8657460Z self = <urllib.request.HTTPDefaultErrorHandler object at 0x7fce189f1f40>
+2026-11-01T21:33:27.8657595Z req = <urllib.request.Request object at 0x7fce1894a750>
+2026-11-01T21:33:27.8657770Z fp = <http.client.HTTPResponse object at 0x7fce1842c490>, code = 404
+2026-11-01T21:33:27.8658041Z msg = 'Not Found', hdrs = <http.client.HTTPMessage object at 0x7fce1842de80>
+2026-11-01T21:33:27.8658050Z 
+2026-11-01T21:33:27.8658196Z     def http_error_default(self, req, fp, code, msg, hdrs):
+2026-11-01T21:33:27.8658326Z >       raise HTTPError(req.full_url, code, msg, hdrs, fp)
+2026-11-01T21:33:27.8658469Z E       urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8658474Z 
+2026-11-01T21:33:27.8658687Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:639: HTTPError
+2026-11-01T21:33:27.8658849Z ----------------------------- Captured stdout call -----------------------------
+2026-11-01T21:33:27.8659147Z Downloading https://github.com/genlayerlabs/genvm/releases/download/v0.3.0-rc7/genvm-universal.tar.xz...
+2026-11-01T21:33:27.8659318Z ___________________ test_deposit_rejects_bad_ledger_address ____________________
+2026-11-01T21:33:27.8659323Z 
+2026-11-01T21:33:27.8659519Z direct_deploy = <function direct_deploy.<locals>._deploy at 0x7fce18331e40>
+2026-11-01T21:33:27.8660119Z direct_vm = VMContext(_sender=b'+\xd8\x06\xc9\x7f\x0e\x00\xaf\x1a\x1f\xc32\x8f\xa7c\xa9&\x97#\xc8', _origin=b'+\xd8\x06\xc9\x7f\x0...m_mocks_hit=set(), _live_web_handler=None, _live_llm_handler=None, _gl_call_hook=None, _traces=[], _trace_enabled=True)
+2026-11-01T21:33:27.8660308Z direct_alice = b'+\xd8\x06\xc9\x7f\x0e\x00\xaf\x1a\x1f\xc32\x8f\xa7c\xa9&\x97#\xc8'
+2026-11-01T21:33:27.8660314Z 
+2026-11-01T21:33:27.8660528Z     def test_deposit_rejects_bad_ledger_address(direct_deploy, direct_vm, direct_alice):
+2026-11-01T21:33:27.8660673Z >       t = deploy_token(direct_deploy, direct_vm, direct_alice)
+2026-11-01T21:33:27.8660781Z             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8660787Z 
+2026-11-01T21:33:27.8660894Z tests/test_rlt_token_direct.py:115: 
+2026-11-01T21:33:27.8661023Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-11-01T21:33:27.8661216Z tests/test_rlt_token_direct.py:17: in deploy_token
+2026-11-01T21:33:27.8661314Z     return direct_deploy(TOKEN)
+2026-11-01T21:33:27.8661407Z            ^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8661714Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/pytest_plugin.py:70: in _deploy
+2026-11-01T21:33:27.8661991Z     return deploy_contract(path, direct_vm, *args, sdk_version=sdk_version, **kwargs)
+2026-11-01T21:33:27.8662118Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8662410Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/loader.py:80: in deploy_contract
+2026-11-01T21:33:27.8662580Z     contract_cls = load_contract_class(contract_path, vm, sdk_version)
+2026-11-01T21:33:27.8662694Z                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8662999Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/loader.py:47: in load_contract_class
+2026-11-01T21:33:27.8663122Z     setup_sdk_paths(contract_path, sdk_version)
+2026-11-01T21:33:27.8663421Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/sdk_loader.py:214: in setup_sdk_paths
+2026-11-01T21:33:27.8663534Z     tarball = download_artifacts(version)
+2026-11-01T21:33:27.8663633Z               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8663944Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/sdk_loader.py:90: in download_artifacts
+2026-11-01T21:33:27.8664089Z     with urllib.request.urlopen(req, timeout=300) as resp:
+2026-11-01T21:33:27.8664184Z          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8664400Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:215: in urlopen
+2026-11-01T21:33:27.8664503Z     return opener.open(url, data, timeout)
+2026-11-01T21:33:27.8664598Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8664816Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:521: in open
+2026-11-01T21:33:27.8664909Z     response = meth(req, response)
+2026-11-01T21:33:27.8664997Z                ^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8665213Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:630: in http_response
+2026-11-01T21:33:27.8665323Z     response = self.parent.error(
+2026-11-01T21:33:27.8665516Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:559: in error
+2026-11-01T21:33:27.8665616Z     return self._call_chain(*args)
+2026-11-01T21:33:27.8665712Z            ^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8665924Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:492: in _call_chain
+2026-11-01T21:33:27.8666016Z     result = func(*args)
+2026-11-01T21:33:27.8666095Z              ^^^^^^^^^^^
+2026-11-01T21:33:27.8666230Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-11-01T21:33:27.8666234Z 
+2026-11-01T21:33:27.8666431Z self = <urllib.request.HTTPDefaultErrorHandler object at 0x7fce189f1f40>
+2026-11-01T21:33:27.8666564Z req = <urllib.request.Request object at 0x7fce1842d310>
+2026-11-01T21:33:27.8666734Z fp = <http.client.HTTPResponse object at 0x7fce1842fa60>, code = 404
+2026-11-01T21:33:27.8666904Z msg = 'Not Found', hdrs = <http.client.HTTPMessage object at 0x7fce1842ee70>
+2026-11-01T21:33:27.8666911Z 
+2026-11-01T21:33:27.8667049Z     def http_error_default(self, req, fp, code, msg, hdrs):
+2026-11-01T21:33:27.8667175Z >       raise HTTPError(req.full_url, code, msg, hdrs, fp)
+2026-11-01T21:33:27.8667313Z E       urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8667317Z 
+2026-11-01T21:33:27.8667521Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:639: HTTPError
+2026-11-01T21:33:27.8667678Z ----------------------------- Captured stdout call -----------------------------
+2026-11-01T21:33:27.8668095Z Downloading https://github.com/genlayerlabs/genvm/releases/download/v0.3.0-rc7/genvm-universal.tar.xz...
+2026-11-01T21:33:27.8668271Z __________________ test_deposit_rejects_bad_depositor_address __________________
+2026-11-01T21:33:27.8668285Z 
+2026-11-01T21:33:27.8668462Z direct_deploy = <function direct_deploy.<locals>._deploy at 0x7fce18332200>
+2026-11-01T21:33:27.8669034Z direct_vm = VMContext(_sender=b'+\xd8\x06\xc9\x7f\x0e\x00\xaf\x1a\x1f\xc32\x8f\xa7c\xa9&\x97#\xc8', _origin=b'+\xd8\x06\xc9\x7f\x0...m_mocks_hit=set(), _live_web_handler=None, _live_llm_handler=None, _gl_call_hook=None, _traces=[], _trace_enabled=True)
+2026-11-01T21:33:27.8669297Z direct_alice = b'+\xd8\x06\xc9\x7f\x0e\x00\xaf\x1a\x1f\xc32\x8f\xa7c\xa9&\x97#\xc8'
+2026-11-01T21:33:27.8669482Z direct_bob = b'\x81\xb67\xd8\xfc\xd2\xc6\xdacY\xe6\x961\x13\xa1\x17\r\xe7\x95\xe4'
+2026-11-01T21:33:27.8669487Z 
+2026-11-01T21:33:27.8669613Z     def test_deposit_rejects_bad_depositor_address(
+2026-11-01T21:33:27.8669740Z         direct_deploy, direct_vm, direct_alice, direct_bob
+2026-11-01T21:33:27.8669822Z     ):
+2026-11-01T21:33:27.8669961Z >       t = deploy_token(direct_deploy, direct_vm, direct_alice)
+2026-11-01T21:33:27.8670130Z             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8670140Z 
+2026-11-01T21:33:27.8670247Z tests/test_rlt_token_direct.py:123: 
+2026-11-01T21:33:27.8670378Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-11-01T21:33:27.8670507Z tests/test_rlt_token_direct.py:17: in deploy_token
+2026-11-01T21:33:27.8670599Z     return direct_deploy(TOKEN)
+2026-11-01T21:33:27.8670686Z            ^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8670970Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/pytest_plugin.py:70: in _deploy
+2026-11-01T21:33:27.8671166Z     return deploy_contract(path, direct_vm, *args, sdk_version=sdk_version, **kwargs)
+2026-11-01T21:33:27.8671284Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8671566Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/loader.py:80: in deploy_contract
+2026-11-01T21:33:27.8671726Z     contract_cls = load_contract_class(contract_path, vm, sdk_version)
+2026-11-01T21:33:27.8671832Z                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8672128Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/loader.py:47: in load_contract_class
+2026-11-01T21:33:27.8672241Z     setup_sdk_paths(contract_path, sdk_version)
+2026-11-01T21:33:27.8672535Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/sdk_loader.py:214: in setup_sdk_paths
+2026-11-01T21:33:27.8672641Z     tarball = download_artifacts(version)
+2026-11-01T21:33:27.8672726Z               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8673024Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/sdk_loader.py:90: in download_artifacts
+2026-11-01T21:33:27.8673159Z     with urllib.request.urlopen(req, timeout=300) as resp:
+2026-11-01T21:33:27.8673261Z          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8673469Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:215: in urlopen
+2026-11-01T21:33:27.8673571Z     return opener.open(url, data, timeout)
+2026-11-01T21:33:27.8673664Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8673863Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:521: in open
+2026-11-01T21:33:27.8673965Z     response = meth(req, response)
+2026-11-01T21:33:27.8674046Z                ^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8674269Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:630: in http_response
+2026-11-01T21:33:27.8674374Z     response = self.parent.error(
+2026-11-01T21:33:27.8674570Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:559: in error
+2026-11-01T21:33:27.8674670Z     return self._call_chain(*args)
+2026-11-01T21:33:27.8674749Z            ^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8675015Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:492: in _call_chain
+2026-11-01T21:33:27.8675111Z     result = func(*args)
+2026-11-01T21:33:27.8675190Z              ^^^^^^^^^^^
+2026-11-01T21:33:27.8675325Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-11-01T21:33:27.8675373Z 
+2026-11-01T21:33:27.8675567Z self = <urllib.request.HTTPDefaultErrorHandler object at 0x7fce189f1f40>
+2026-11-01T21:33:27.8675712Z req = <urllib.request.Request object at 0x7fce184bcb00>
+2026-11-01T21:33:27.8675876Z fp = <http.client.HTTPResponse object at 0x7fce184bd150>, code = 404
+2026-11-01T21:33:27.8676058Z msg = 'Not Found', hdrs = <http.client.HTTPMessage object at 0x7fce184bcc20>
+2026-11-01T21:33:27.8676063Z 
+2026-11-01T21:33:27.8676205Z     def http_error_default(self, req, fp, code, msg, hdrs):
+2026-11-01T21:33:27.8676338Z >       raise HTTPError(req.full_url, code, msg, hdrs, fp)
+2026-11-01T21:33:27.8676484Z E       urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8676489Z 
+2026-11-01T21:33:27.8676694Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:639: HTTPError
+2026-11-01T21:33:27.8676866Z ----------------------------- Captured stdout call -----------------------------
+2026-11-01T21:33:27.8677156Z Downloading https://github.com/genlayerlabs/genvm/releases/download/v0.3.0-rc7/genvm-universal.tar.xz...
+2026-11-01T21:33:27.8677320Z ___________________ test_balance_of_unknown_account_is_zero ____________________
+2026-11-01T21:33:27.8677325Z 
+2026-11-01T21:33:27.8677512Z direct_deploy = <function direct_deploy.<locals>._deploy at 0x7fce18331ee0>
+2026-11-01T21:33:27.8678308Z direct_vm = VMContext(_sender=b'+\xd8\x06\xc9\x7f\x0e\x00\xaf\x1a\x1f\xc32\x8f\xa7c\xa9&\x97#\xc8', _origin=b'+\xd8\x06\xc9\x7f\x0...m_mocks_hit=set(), _live_web_handler=None, _live_llm_handler=None, _gl_call_hook=None, _traces=[], _trace_enabled=True)
+2026-11-01T21:33:27.8678633Z direct_alice = b'+\xd8\x06\xc9\x7f\x0e\x00\xaf\x1a\x1f\xc32\x8f\xa7c\xa9&\x97#\xc8'
+2026-11-01T21:33:27.8678641Z 
+2026-11-01T21:33:27.8678850Z     def test_balance_of_unknown_account_is_zero(direct_deploy, direct_vm, direct_alice):
+2026-11-01T21:33:27.8678985Z >       t = deploy_token(direct_deploy, direct_vm, direct_alice)
+2026-11-01T21:33:27.8679097Z             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8679105Z 
+2026-11-01T21:33:27.8679209Z tests/test_rlt_token_direct.py:130: 
+2026-11-01T21:33:27.8679333Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-11-01T21:33:27.8679461Z tests/test_rlt_token_direct.py:17: in deploy_token
+2026-11-01T21:33:27.8679555Z     return direct_deploy(TOKEN)
+2026-11-01T21:33:27.8679644Z            ^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8679926Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/pytest_plugin.py:70: in _deploy
+2026-11-01T21:33:27.8680131Z     return deploy_contract(path, direct_vm, *args, sdk_version=sdk_version, **kwargs)
+2026-11-01T21:33:27.8680255Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8680539Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/loader.py:80: in deploy_contract
+2026-11-01T21:33:27.8680706Z     contract_cls = load_contract_class(contract_path, vm, sdk_version)
+2026-11-01T21:33:27.8680816Z                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8681117Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/loader.py:47: in load_contract_class
+2026-11-01T21:33:27.8681236Z     setup_sdk_paths(contract_path, sdk_version)
+2026-11-01T21:33:27.8681523Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/sdk_loader.py:214: in setup_sdk_paths
+2026-11-01T21:33:27.8681629Z     tarball = download_artifacts(version)
+2026-11-01T21:33:27.8681715Z               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8682088Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/gltest/direct/sdk_loader.py:90: in download_artifacts
+2026-11-01T21:33:27.8682225Z     with urllib.request.urlopen(req, timeout=300) as resp:
+2026-11-01T21:33:27.8682325Z          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8682594Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:215: in urlopen
+2026-11-01T21:33:27.8682696Z     return opener.open(url, data, timeout)
+2026-11-01T21:33:27.8682789Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8682986Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:521: in open
+2026-11-01T21:33:27.8683088Z     response = meth(req, response)
+2026-11-01T21:33:27.8683170Z                ^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8683400Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:630: in http_response
+2026-11-01T21:33:27.8683507Z     response = self.parent.error(
+2026-11-01T21:33:27.8683703Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:559: in error
+2026-11-01T21:33:27.8683800Z     return self._call_chain(*args)
+2026-11-01T21:33:27.8683878Z            ^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-01T21:33:27.8684096Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:492: in _call_chain
+2026-11-01T21:33:27.8684190Z     result = func(*args)
+2026-11-01T21:33:27.8684270Z              ^^^^^^^^^^^
+2026-11-01T21:33:27.8684399Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-11-01T21:33:27.8684404Z 
+2026-11-01T21:33:27.8684590Z self = <urllib.request.HTTPDefaultErrorHandler object at 0x7fce189f1f40>
+2026-11-01T21:33:27.8684732Z req = <urllib.request.Request object at 0x7fce189efbc0>
+2026-11-01T21:33:27.8684893Z fp = <http.client.HTTPResponse object at 0x7fce1842d2d0>, code = 404
+2026-11-01T21:33:27.8685068Z msg = 'Not Found', hdrs = <http.client.HTTPMessage object at 0x7fce1842ff20>
+2026-11-01T21:33:27.8685073Z 
+2026-11-01T21:33:27.8685214Z     def http_error_default(self, req, fp, code, msg, hdrs):
+2026-11-01T21:33:27.8685340Z >       raise HTTPError(req.full_url, code, msg, hdrs, fp)
+2026-11-01T21:33:27.8685474Z E       urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8685480Z 
+2026-11-01T21:33:27.8685676Z /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/urllib/request.py:639: HTTPError
+2026-11-01T21:33:27.8685844Z ----------------------------- Captured stdout call -----------------------------
+2026-11-01T21:33:27.8686129Z Downloading https://github.com/genlayerlabs/genvm/releases/download/v0.3.0-rc7/genvm-universal.tar.xz...
+2026-11-01T21:33:27.8686263Z =========================== short test summary info ============================
+2026-11-01T21:33:27.8686706Z FAILED tests/test_repro_lab_direct.py::test_deploy_overview_empty - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8687001Z FAILED tests/test_repro_lab_direct.py::test_deploy_custody_summary - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8687304Z FAILED tests/test_repro_lab_direct.py::test_refundable_balance_zero - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8687591Z FAILED tests/test_repro_lab_direct.py::test_fund_credits_pool - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8688048Z FAILED tests/test_repro_lab_direct.py::test_fund_below_minimum_soft_fail - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8688474Z FAILED tests/test_repro_lab_direct.py::test_fund_zero_value_raise - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8688784Z FAILED tests/test_repro_lab_direct.py::test_soft_fail_increments_counter - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8689101Z FAILED tests/test_repro_lab_direct.py::test_register_requires_funded_pool - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8689446Z FAILED tests/test_repro_lab_direct.py::test_register_success - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8689742Z FAILED tests/test_repro_lab_direct.py::test_register_baseline_off_grid - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8690057Z FAILED tests/test_repro_lab_direct.py::test_register_rejects_http_artifact - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8690425Z FAILED tests/test_repro_lab_direct.py::test_register_trial_window_ceiling - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8690725Z FAILED tests/test_repro_lab_direct.py::test_register_trial_window_floor - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8691067Z FAILED tests/test_repro_lab_direct.py::test_register_author_window_ceiling - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8691367Z FAILED tests/test_repro_lab_direct.py::test_register_timeout_window_bounds - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8691671Z FAILED tests/test_repro_lab_direct.py::test_register_basline_out_of_range - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8691985Z FAILED tests/test_repro_lab_direct.py::test_register_surplus_soft_credited - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8692285Z FAILED tests/test_repro_lab_direct.py::test_register_reservation_ceiling - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8692574Z FAILED tests/test_repro_lab_direct.py::test_stake_unknown_study - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8692892Z FAILED tests/test_repro_lab_direct.py::test_stake_pi_self_replication_blocked - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8693175Z FAILED tests/test_repro_lab_direct.py::test_stake_bond_minimum - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8693455Z FAILED tests/test_repro_lab_direct.py::test_stake_bad_checksum - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8693734Z FAILED tests/test_repro_lab_direct.py::test_stake_off_grid_claim - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8694040Z FAILED tests/test_repro_lab_direct.py::test_stake_success_sets_awaiting - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8694334Z FAILED tests/test_repro_lab_direct.py::test_stake_duplicate_lab_blocked - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8694640Z FAILED tests/test_repro_lab_direct.py::test_stake_after_close_blocked - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8694945Z FAILED tests/test_repro_lab_direct.py::test_stake_reservation_race_check - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8695265Z FAILED tests/test_repro_lab_direct.py::test_author_response_only_pi - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8695566Z FAILED tests/test_repro_lab_direct.py::test_author_response_sets_ready - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8695956Z FAILED tests/test_repro_lab_direct.py::test_evaluate_gated_before_author_response - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8696349Z FAILED tests/test_repro_lab_direct.py::test_evaluate_gated_after_author_deadline_expiry - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8696674Z FAILED tests/test_repro_lab_direct.py::test_evaluate_unknown_study_raises - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8696947Z FAILED tests/test_repro_lab_direct.py::test_evaluate_exact_band - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8697230Z FAILED tests/test_repro_lab_direct.py::test_evaluate_partial_band - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8697527Z FAILED tests/test_repro_lab_direct.py::test_evaluate_inconclusive_band - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8697969Z FAILED tests/test_repro_lab_direct.py::test_evaluate_fabrication_band - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8698335Z FAILED tests/test_repro_lab_direct.py::test_evaluate_integrity_bucket_quantization - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8698668Z FAILED tests/test_repro_lab_direct.py::test_settle_blocked_during_challenge_window - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8699151Z FAILED tests/test_repro_lab_direct.py::test_settle_exact_pays_replicator - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8699483Z FAILED tests/test_repro_lab_direct.py::test_settle_partial_splits_grant - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8699823Z FAILED tests/test_repro_lab_direct.py::test_settle_inconclusive_refunds_principal - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8700172Z FAILED tests/test_repro_lab_direct.py::test_settle_fraud_slashes_bond_to_whistleblower - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8700473Z FAILED tests/test_repro_lab_direct.py::test_settle_not_evaluated_raises - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8700763Z FAILED tests/test_repro_lab_direct.py::test_settle_overview_stats - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8701088Z FAILED tests/test_repro_lab_direct.py::test_challenge_self_challenge_blocked - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8701395Z FAILED tests/test_repro_lab_direct.py::test_challenge_forces_reevaluation - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8701720Z FAILED tests/test_repro_lab_direct.py::test_challenge_window_closed_soft_fail - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8702028Z FAILED tests/test_repro_lab_direct.py::test_zero_winner_blocked_before_close - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8702344Z FAILED tests/test_repro_lab_direct.py::test_zero_winner_refunds_principal - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8702643Z FAILED tests/test_repro_lab_direct.py::test_timeout_refund_with_bonds - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8702932Z FAILED tests/test_repro_lab_direct.py::test_withdraw_refund_success - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8703257Z FAILED tests/test_repro_lab_direct.py::test_withdraw_refund_over_credit_raises - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8703560Z FAILED tests/test_repro_lab_direct.py::test_withdraw_refund_zero_raises - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8703855Z FAILED tests/test_repro_lab_direct.py::test_claim_refundable_balance - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8704164Z FAILED tests/test_repro_lab_direct.py::test_claim_refundable_empty_raises - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8704452Z FAILED tests/test_repro_lab_direct.py::test_rlt_deposit_zero_raises - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8704740Z FAILED tests/test_repro_lab_direct.py::test_rlt_received_only_token - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8705044Z FAILED tests/test_repro_lab_direct.py::test_rlt_received_mismatch_raises - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8705306Z FAILED tests/test_repro_lab_direct.py::test_rlt_credit_flow - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8705632Z FAILED tests/test_repro_lab_direct.py::test_rlt_credit_rejects_unknown_depositor - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8705945Z FAILED tests/test_repro_lab_direct.py::test_rlt_withdraw_insufficient_raises - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8706246Z FAILED tests/test_repro_lab_direct.py::test_rlt_withdraw_reduces_vault - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8706579Z FAILED tests/test_repro_lab_direct.py::test_study_card_not_found - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8706862Z FAILED tests/test_repro_lab_direct.py::test_trial_book_lists_labs - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8707228Z FAILED tests/test_repro_lab_direct.py::test_reproducibility_index_pagination - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8707535Z FAILED tests/test_repro_lab_direct.py::test_custody_summary_reservation_math - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8707986Z FAILED tests/test_repro_lab_direct.py::test_sanitization_strips_angle_brackets - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8708434Z FAILED tests/test_repro_lab_direct.py::test_second_lab_bond_tracked_separately - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8708747Z FAILED tests/test_repro_lab_direct.py::test_address_key_is_case_insensitive - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8709049Z FAILED tests/test_repro_lab_direct.py::test_card_deadlines_follow_warp - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8709389Z FAILED tests/test_repro_lab_direct.py::test_settle_returns_challenge_bond_to_replicator - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8709708Z FAILED tests/test_repro_lab_direct.py::test_deposit_twice_reverts_when_pending - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8710023Z FAILED tests/test_repro_lab_direct.py::test_on_rlt_received_wrong_ref_reverts - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8710313Z FAILED tests/test_repro_lab_direct.py::test_fraud_slash_target_is_the_pi - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8710660Z FAILED tests/test_repro_lab_direct.py::test_stake_debits_pool_and_bond_is_reserved_twice - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8711011Z FAILED tests/test_repro_lab_direct.py::test_released_bond_stays_above_published_buckets - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8711371Z FAILED tests/test_repro_lab_direct.py::test_rlt_deposit_has_no_recovery_if_callback_never_lands - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8711736Z FAILED tests/test_repro_lab_direct.py::test_expired_after_challenge_forfeits_challenge_bond - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8712026Z FAILED tests/test_rlt_token_direct.py::test_supply_minted_to_creator - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8712320Z FAILED tests/test_rlt_token_direct.py::test_transfer_moves_balance - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8712612Z FAILED tests/test_rlt_token_direct.py::test_transfer_zero_reverts - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8712924Z FAILED tests/test_rlt_token_direct.py::test_transfer_over_balance_reverts - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8713239Z FAILED tests/test_rlt_token_direct.py::test_transfer_bad_address_reverts - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8713544Z FAILED tests/test_rlt_token_direct.py::test_allowance_starts_zero - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8713847Z FAILED tests/test_rlt_token_direct.py::test_approve_records_allowance - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8714142Z FAILED tests/test_rlt_token_direct.py::test_approve_negative_reverts - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8714434Z FAILED tests/test_rlt_token_direct.py::test_deposit_requires_allowance - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8714736Z FAILED tests/test_rlt_token_direct.py::test_deposit_only_ledger_may_call - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8715091Z FAILED tests/test_rlt_token_direct.py::test_deposit_positive_amount_only - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8715444Z FAILED tests/test_rlt_token_direct.py::test_deposit_credits_ledger_and_spend_allowance - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8715822Z FAILED tests/test_rlt_token_direct.py::test_deposit_exceeding_balance_reverts - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8716138Z FAILED tests/test_rlt_token_direct.py::test_deposit_rejects_bad_ledger_address - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8716479Z FAILED tests/test_rlt_token_direct.py::test_deposit_rejects_bad_depositor_address - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8716796Z FAILED tests/test_rlt_token_direct.py::test_balance_of_unknown_account_is_zero - urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-11-01T21:33:27.8716881Z 94 failed in 26.86s
+2026-11-01T21:33:27.9733823Z ##[error]Process completed with exit code 1.
+2026-11-01T21:33:27.9874707Z Post job cleanup.
+2026-11-01T21:33:28.0709076Z [command]/usr/bin/git version
+2026-11-01T21:33:28.0778674Z git version 2.56.0
+2026-11-01T21:33:28.0814385Z Temporarily overriding HOME='/home/runner/work/_temp/3541566d-978a-4833-853e-6e04a9a1d407' before making global git config changes
+2026-11-01T21:33:28.0815552Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-01T21:33:28.0820473Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/repro-lab/repro-lab
+2026-11-01T21:33:28.0859573Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-01T21:33:28.0892774Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-01T21:33:28.1108583Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-01T21:33:28.1135503Z http.https://github.com/.extraheader
+2026-11-01T21:33:28.1146659Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-01T21:33:28.1189779Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-01T21:33:28.1451840Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-01T21:33:28.1502122Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-01T21:33:28.1909830Z Cleaning up orphan processes
+2026-11-01T21:33:28.2228220Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+html_url https://github.com/richeroveis/repro-lab/actions/runs/41352550475

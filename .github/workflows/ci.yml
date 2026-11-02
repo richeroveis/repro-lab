@@ -24,6 +24,37 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install "genlayer-test==0.29.2" pytest
 
+      # The direct runner resolves a GenLayer *release tag* for the tarball and
+      # then uses the contract's pinned runner hash to choose the runner inside
+      # it. Without a cache it asks /releases/latest, which lands on the v0.3.0
+      # pre-release tag that publishes no genvm-universal.tar.xz asset, so every
+      # test would die on a 404. v0.2.16 does publish the asset and does contain
+      # the pinned runner hash, so seeding the cache runs the same runner the
+      # contract declares and the one the studionet deployment uses.
+      - name: Seed the GenVM runner cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/gltest-direct
+          key: gltest-direct-v0.2.16
+          restore-keys: gltest-direct-
+
+      - name: Download the runner tarball if the cache missed
+        run: |
+          mkdir -p "$HOME/.cache/gltest-direct"
+          TARBALL="$HOME/.cache/gltest-direct/genvm-universal-v0.2.16.tar.xz"
+          if [ ! -f "$TARBALL" ]; then
+            curl -fsSL --retry 3 -o "$TARBALL" \
+              https://github.com/genlayerlabs/genvm/releases/download/v0.2.16/genvm-universal.tar.xz
+          fi
+          ls -lh "$TARBALL"
+          python - <<'PY'
+          from gltest.direct import sdk_loader
+          cached = sdk_loader.list_cached_versions()
+          print("cached runner releases:", cached)
+          if not cached:
+              raise SystemExit("cache seeding failed")
+          PY
+
       - name: Check the pinned runner and the byte budget
         run: |
           python - <<'PY'
