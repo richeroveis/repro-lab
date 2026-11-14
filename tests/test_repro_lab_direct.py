@@ -875,13 +875,12 @@ def test_fraud_slash_target_is_the_pi(direct_deploy, direct_vm, direct_alice, di
     assert card["slash_target"] == hexof(direct_alice).lower()
 
 
-# ------------------------------------------------ review regression coverage
-# These three tests pin the findings written up in docs/adversarial-review.md.
-# They describe behavior as deployed, they do not ask for a change to it.
+# ------------------------------------------------ remediated review coverage
+# These tests explicitly exercise the remediated terminal and recovery paths.
 
 
-def test_stake_debits_pool_and_bond_is_reserved_twice(direct_deploy, direct_vm, direct_alice, direct_bob):
-    """F-B: a bond lowers the pool book and is also counted as a reservation."""
+def test_stake_leaves_pool_intact_and_bond_reserved(direct_deploy, direct_vm, direct_alice, direct_bob):
+    """Remediation 2 (F-B): a bond does NOT debit the pool book, remaining accounted."""
     c = deploy(direct_deploy, direct_vm, direct_alice)
     mock_pages(direct_vm)
     fund(direct_vm, direct_alice, c)
@@ -889,13 +888,13 @@ def test_stake_debits_pool_and_bond_is_reserved_twice(direct_deploy, direct_vm, 
     pool_before = int(c.get_lab_overview()["endowment_pool_atto"])
     stake(direct_vm, c, direct_bob)
     ov = c.get_lab_overview()
-    assert int(ov["endowment_pool_atto"]) == pool_before - BOND
+    assert int(ov["endowment_pool_atto"]) == pool_before
     assert int(ov["open_bonds_atto"]) == BOND
     assert int(ov["reserve_required_atto"]) == 10 * E1 * 150 // 100 + BOND
 
 
-def test_released_bond_stays_above_published_buckets(direct_deploy, direct_vm, direct_alice, direct_bob):
-    """F-B: after settlement the released bond never returns to the pool book."""
+def test_released_bond_exact_conservation_zero_residue(direct_deploy, direct_vm, direct_alice, direct_bob):
+    """Remediation 2 (F-B): released bond is fully accounted with 0 stranded residue."""
     c = deploy(direct_deploy, direct_vm, direct_alice)
     mock_pages(direct_vm)
     mock_audit(direct_vm, 5000)
@@ -913,30 +912,33 @@ def test_released_bond_stays_above_published_buckets(direct_deploy, direct_vm, d
     ov = c.get_lab_overview()
     assert int(card["bonds_consumed_atto"]) == BOND
     assert int(ov["open_bonds_atto"]) == 0
-    assert int(ov["endowment_pool_atto"]) == pool_before - BOND
-    # The replicator is owed grant plus bond, but only the grant came out of the
-    # pool book, so the contract native balance sits BOND above the four buckets.
+    assert int(ov["endowment_pool_atto"]) == pool_before
     summary = c.get_custody_accounting_summary()
     assert int(summary["credits_outstanding_atto"]) == 10 * E1 + BOND
+    assert int(summary["open_bonds_atto"]) == 0
+    # Conservation holds: pool + locked + open_bonds + credits == total liabilities
+    total = int(summary["endowment_pool_atto"]) + int(summary["total_endowment_locked"]) + int(summary["open_bonds_atto"]) + int(summary["credits_outstanding_atto"])
+    assert total == int(summary["total_custody_liabilities_atto"])
 
 
-def test_rlt_deposit_has_no_recovery_if_callback_never_lands(direct_deploy, direct_vm, direct_alice):
-    """F-C: one failed token callback bricks the RLT deposit path for everyone."""
+def test_rlt_deposit_has_bounded_recovery_after_timeout(direct_deploy, direct_vm, direct_alice):
+    """Remediation 3 (F-C): stuck pending slot has bounded recovery window and unblocks."""
     c = deploy(direct_deploy, direct_vm, direct_alice)
     direct_vm.sender = direct_alice
     c.deposit_rlt_custody(E1)
-    # The emitted deposit_into_ledger can revert on allowance or balance, and
-    # nothing but a successful callback clears the pending slot, not time.
-    direct_vm.warp("2027-01-01T00:00:00+00:00")
+    # Reverts while pending window is active
     with direct_vm.expect_revert("pending deposit in flight"):
         c.deposit_rlt_custody(E1)
+    # After timeout passes (120s), the slot resets cleanly and deposit succeeds
+    direct_vm.warp("2026-01-01T00:05:00+00:00")
+    c.deposit_rlt_custody(E1)
     assert int(c.get_custody_accounting_summary()["vault_custody_balance"]) == 0
 
 
-def test_expired_after_challenge_forfeits_challenge_bond(
+def test_expired_after_challenge_refunds_challenger_in_full(
     direct_deploy, direct_vm, direct_alice, direct_bob, direct_charlie
 ):
-    """F-D: a challenge bond posted before an audit timeout pays nobody."""
+    """Remediation 1 (F-D): challenge bond is 100% refunded if study expires mid-challenge."""
     c = deploy(direct_deploy, direct_vm, direct_alice)
     mock_pages(direct_vm)
     mock_audit(direct_vm, 5000)
@@ -956,6 +958,165 @@ def test_expired_after_challenge_forfeits_challenge_bond(
     card = c.get_study_card(1)
     assert card["status"] == "EXPIRED_NO_VALID_REPLICATION"
     assert int(card["bonds_consumed_atto"]) == BOND + CHALLENGE_BOND
-    # the staked lab is refunded, the challenger is not
+    # Both the staked lab and the challenger are 100% refunded
     assert int(c.get_refundable_balance(direct_bob)) == BOND
+    assert int(c.get_refundable_balance(direct_charlie)) == CHALLENGE_BOND
+
+
+def test_challenge_upheld_returns_bond_to_challenger(
+    direct_deploy, direct_vm, direct_alice, direct_bob, direct_charlie
+):
+    """Remediation 1: Challenge bond returned 100% to challenger when challenge is upheld."""
+    c = deploy(direct_deploy, direct_vm, direct_alice)
+    mock_pages(direct_vm)
+    # First evaluation: EXACT (5000 bps)
+    mock_audit(direct_vm, 5000)
+    funded_registered(direct_vm, c, direct_alice, direct_bob)
+    direct_vm.sender = direct_alice
+    c.submit_author_response(1, "ok")
+    direct_vm.warp("2026-01-01T00:06:00+00:00")
+    c.evaluate_replication_trial(1)
+    card1 = c.get_study_card(1)
+    assert card1["verdict_band"] == "EXACT_REPLICATION_VERIFIED"
+
+    # Charlie posts challenge bond
+    direct_vm.sender = direct_charlie
+    direct_vm.value = CHALLENGE_BOND
+    c.challenge_replication_ruling_payable(1, "disputing exact match")
+    direct_vm.value = 0
+
+    # Re-evaluation produces a DIFFERENT verdict: INCONCLUSIVE (e.g. 7000 bps, high deviation)
+    direct_vm._llm_mocks.clear()
+    mock_audit(direct_vm, 7000)
+    direct_vm.warp("2026-01-01T00:12:00+00:00")
+    c.evaluate_replication_trial(1)
+    card2 = c.get_study_card(1)
+    assert card2["verdict_band"] == "INCONCLUSIVE_VARIANCE_REFUND"
+
+    # Challenge window expires, settle
+    direct_vm.warp("2026-01-01T00:15:00+00:00")
+    c.settle_replication_grant(1)
+
+    # Challenge was upheld: challenger gets 100% of challenge bond back!
+    assert int(c.get_refundable_balance(direct_charlie)) == CHALLENGE_BOND
+    # Defending replicator does NOT get the challenge bond
+    assert int(c.get_refundable_balance(direct_bob)) == BOND
+
+
+def test_challenge_rejected_routes_bond_to_defender(
+    direct_deploy, direct_vm, direct_alice, direct_bob, direct_charlie
+):
+    """Remediation 1: Challenge bond routed to defending counterparty when challenge is rejected."""
+    c = deploy(direct_deploy, direct_vm, direct_alice)
+    mock_pages(direct_vm)
+    # First evaluation: EXACT (5000 bps)
+    mock_audit(direct_vm, 5000)
+    funded_registered(direct_vm, c, direct_alice, direct_bob)
+    direct_vm.sender = direct_alice
+    c.submit_author_response(1, "ok")
+    direct_vm.warp("2026-01-01T00:06:00+00:00")
+    c.evaluate_replication_trial(1)
+
+    # Charlie challenges
+    direct_vm.sender = direct_charlie
+    direct_vm.value = CHALLENGE_BOND
+    c.challenge_replication_ruling_payable(1, "unfounded challenge")
+    direct_vm.value = 0
+
+    # Re-evaluation: verdict confirmed as EXACT (5000 bps)
+    direct_vm._llm_mocks.clear()
+    mock_audit(direct_vm, 5000)
+    direct_vm.warp("2026-01-01T00:12:00+00:00")
+    c.evaluate_replication_trial(1)
+
+    direct_vm.warp("2026-01-01T00:15:00+00:00")
+    c.settle_replication_grant(1)
+
+    # Challenge was rejected: challenger receives 0, defending replicator receives grant + bond + challenge bond
     assert int(c.get_refundable_balance(direct_charlie)) == 0
+    assert int(c.get_refundable_balance(direct_bob)) == 10 * E1 + BOND + CHALLENGE_BOND
+
+
+def test_exact_zero_residue_conservation_full_lifecycle(
+    direct_deploy, direct_vm, direct_alice, direct_bob, direct_charlie
+):
+    """Remediation 2: Exact conservation across full multi-signer lifecycle with zero residue."""
+    c = deploy(direct_deploy, direct_vm, direct_alice)
+    mock_pages(direct_vm)
+    mock_audit(direct_vm, 5000)
+
+    # 1. Fund endowment pool
+    direct_vm.sender = direct_alice
+    direct_vm.value = 20 * E1
+    c.fund_endowment_payable()
+    direct_vm.value = 0
+
+    # Invariant check
+    summary = c.get_custody_accounting_summary()
+    assert int(summary["endowment_pool_atto"]) == 20 * E1
+    assert int(summary["total_custody_liabilities_atto"]) == 20 * E1
+
+    # 2. Register study with surplus
+    direct_vm.value = 12 * E1  # 10 E1 endowment + 2 E1 surplus
+    c.register_study_bounty_payable("Study 1", ARTIFACT_URL, "perplexity_drift_reduction", 5000, 10 * E1, 300, 60, 600)
+    direct_vm.value = 0
+
+    summary = c.get_custody_accounting_summary()
+    assert int(summary["total_endowment_locked"]) == 10 * E1
+    assert int(summary["credits_outstanding_atto"]) == 2 * E1  # surplus returned to credits
+    assert int(summary["total_custody_liabilities_atto"]) == 32 * E1  # 20 + 12
+
+    # 3. Stake trial bond
+    direct_vm.sender = direct_bob
+    direct_vm.value = BOND
+    c.stake_replication_trial_payable(1, 5000, 9500, "a" * 64, LOG_URL)
+    direct_vm.value = 0
+
+    summary = c.get_custody_accounting_summary()
+    assert int(summary["open_bonds_atto"]) == BOND
+    assert int(summary["total_custody_liabilities_atto"]) == 32 * E1 + BOND
+
+    # 4. Author response + evaluate
+    direct_vm.sender = direct_alice
+    c.submit_author_response(1, "ok")
+    direct_vm.warp("2026-01-01T00:06:00+00:00")
+    c.evaluate_replication_trial(1)
+
+    # 5. Challenge bond
+    direct_vm.sender = direct_charlie
+    direct_vm.value = CHALLENGE_BOND
+    c.challenge_replication_ruling_payable(1, "audit again")
+    direct_vm.value = 0
+
+    summary = c.get_custody_accounting_summary()
+    assert int(summary["open_bonds_atto"]) == BOND + CHALLENGE_BOND
+    assert int(summary["total_custody_liabilities_atto"]) == 32 * E1 + BOND + CHALLENGE_BOND
+
+    # 6. Re-evaluate and settle
+    direct_vm._llm_mocks.clear()
+    mock_audit(direct_vm, 5000)
+    direct_vm.warp("2026-01-01T00:12:00+00:00")
+    c.evaluate_replication_trial(1)
+    direct_vm.warp("2026-01-01T00:15:00+00:00")
+    c.settle_replication_grant(1)
+
+    summary = c.get_custody_accounting_summary()
+    assert int(summary["total_endowment_locked"]) == 0
+    assert int(summary["open_bonds_atto"]) == 0
+    # Everything moved into claimable credits
+    expected_credits = 2 * E1 + 10 * E1 + BOND + CHALLENGE_BOND
+    assert int(summary["credits_outstanding_atto"]) == expected_credits
+    assert int(summary["total_custody_liabilities_atto"]) == 20 * E1 + 12 * E1 + BOND + CHALLENGE_BOND
+
+    # 7. Withdraw all credits
+    direct_vm.sender = direct_alice
+    c.claim_refundable_balance()
+    direct_vm.sender = direct_bob
+    c.claim_refundable_balance()
+
+    summary_final = c.get_custody_accounting_summary()
+    assert int(summary_final["credits_outstanding_atto"]) == 0
+    assert int(summary_final["external_payouts_atto"]) == expected_credits
+    assert int(summary_final["total_custody_liabilities_atto"]) == 20 * E1
+    assert int(summary_final["endowment_pool_atto"]) == 20 * E1
+

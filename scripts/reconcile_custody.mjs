@@ -3,7 +3,7 @@
 // Read only: sends nothing and changes no state.
 import fs from 'node:fs';
 
-const LEDGER = '0xdC4D683437C797438b0F96bA526101286111d9eB';
+const LEDGER = '0x058956aF320Dec12e419E94970bA1AC40292af33';
 const E1 = 10n ** 18n;
 
 const rows = fs

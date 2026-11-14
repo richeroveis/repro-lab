@@ -13,7 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const REPO = 'https://x-access-token@github.com/richeroveis/repro-lab.git';
-const ASKPASS = path.join(process.cwd(), '.git-askpass.cmd');
+const ASKPASS = path.join(process.cwd(), process.platform === 'win32' ? '.git-askpass.cmd' : '.git-askpass.sh');
 const GH_PAGES_WORKTREE = path.join(process.cwd(), '.gh-pages-work');
 
 function token() {
@@ -29,7 +29,11 @@ function git(args) {
   const t = token();
   // The URL already carries the username, so git only asks for the password.
   // Nothing is echoed to the console: the value goes to git's stdin only.
-  fs.writeFileSync(ASKPASS, '@echo off\r\necho %REPROLAB_TOKEN%\r\n', 'utf8');
+  if (process.platform === 'win32') {
+    fs.writeFileSync(ASKPASS, '@echo off\r\necho %REPROLAB_TOKEN%\r\n', 'utf8');
+  } else {
+    fs.writeFileSync(ASKPASS, '#!/bin/sh\necho "$REPROLAB_TOKEN"\n', { encoding: 'utf8', mode: 0o755 });
+  }
   try {
     return execFileSync('git', ['-c', 'credential.helper=', ...args], {
       encoding: 'utf8',

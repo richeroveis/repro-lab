@@ -22,7 +22,7 @@ const ART_BASE =
   process.env.REPROLAB_ART_BASE || 'https://richeroveis.github.io/repro-lab/artifacts';
 const CKPT_PATH = 'evidence/_checkpoint.json';
 const TXLOG_PATH = 'evidence/_txs.jsonl';
-const POOL_FUND = 8n * E1;
+const POOL_FUND = 6n * E1;
 const ENDOWMENT = 1n * E1;
 const BOND = 5n * 10n ** 17n;
 const CHALLENGE_BOND = 1n * E1;
@@ -259,35 +259,35 @@ const STUDIES = [
     target: 'sanger-basecall-accuracy',
     baseline: 8250n,
     tw: 30n,
-    aw: 60n,
-    twt: 3600n,
+    aw: 30n,
+    twt: 90n,
   },
   {
     key: 'drift',
     title: 'LLM Quantization Perplexity Drift Study',
     target: 'quantization-perplexity-drift',
     baseline: 5250n,
-    tw: 600n,
-    aw: 300n,
-    twt: 1800n,
+    tw: 240n,
+    aw: 30n,
+    twt: 600n,
   },
   {
     key: 'crispr',
     title: 'CRISPR Off-Target Cleavage Dataset Benchmark',
     target: 'crispr-offtarget-cleavage-rate',
     baseline: 6750n,
-    tw: 600n,
-    aw: 300n,
-    twt: 1800n,
+    tw: 300n,
+    aw: 30n,
+    twt: 600n,
   },
   {
     key: 'meissner',
     title: 'Superconductor Meissner Curve Reproduction',
     target: 'meissner-flux-expulsion-fraction',
     baseline: 4000n,
-    tw: 600n,
-    aw: 120n,
-    twt: 900n,
+    tw: 360n,
+    aw: 30n,
+    twt: 450n,
   },
 ];
 
@@ -379,6 +379,13 @@ async function stepSeed(lab) {
     }
     console.log('balance', name, addr, await lab.balance(addr));
   }
+  // Simulated failed-callback recovery lifecycle path on RLTToken
+  await lab.write('seed-rlt-transfer-labB', 'pi', lab.token, 'transfer', [lab.addrOf('labB'), 50n * E1]);
+  await lab.write('seed-rlt-approve-simulated', 'labB', lab.token, 'approve', [lab.addrOf('labC'), 50n * E1]);
+  await lab.write('deposit-ledger-unconfirmed', 'labC', lab.token, 'deposit_into_ledger', [lab.addrOf('labC'), lab.addrOf('labB'), 50n * E1, 999n]);
+  await lab.write('recover-failed-deposit', 'labB', lab.token, 'recover_failed_deposit', [999n]);
+  await lab.write('recover-failed-deposit-replay', 'labB', lab.token, 'recover_failed_deposit', [999n], 0n, 'revert');
+
   await lab.write('seed-pool', 'pi', lab.ledger, 'fund_endowment_payable', [], POOL_FUND);
   await lab.write('seed-rlt-approve', 'pi', lab.token, 'approve', [lab.ledger, 2000n * E1]);
   await lab.write('seed-rlt-deposit', 'pi', lab.ledger, 'deposit_rlt_custody', [1000n * E1]);
@@ -398,9 +405,8 @@ async function stepSeed(lab) {
 }
 
 async function stepRegister(lab) {
-  // The pool must cover 150 percent of escrowed endowments plus every open
-  // bond, so top it up to 12 GEN before opening four bounties.
-  await lab.write('register-pool-topup', 'pi', lab.ledger, 'fund_endowment_payable', [], 4n * E1);
+  // Pool was seeded with 6 GEN. Top up by 0.8 GEN to cover 150% reservation comfortably.
+  await lab.write('register-pool-topup', 'pi', lab.ledger, 'fund_endowment_payable', [], 8n * 10n ** 17n);
   const seq = spec('sequencing');
   await lab.write(
     'register-softfail-underfunded',
@@ -505,7 +511,7 @@ async function stepStake(lab) {
     BOND,
     'soft-fail'
   );
-  for (const key of ['drift', 'crispr']) {
+  for (const key of ['drift', 'crispr', 'meissner']) {
     await lab.write(
       'author-response-' + key,
       'pi',
@@ -543,20 +549,22 @@ async function stepClosedWindow(lab) {
 }
 
 async function stepEvaluate(lab) {
-  const key = process.argv[3] === 'crispr' ? 'crispr' : 'drift';
-  const entry = lab.ck.studies[key];
-  await waitChainTime(lab, entry.trial_close_epoch, 3);
-  const row = await lab.write('evaluate-' + key, 'pi', lab.ledger, 'evaluate_replication_trial', [sid(lab, key)]);
-  const c = await card(lab, key);
-  entry.band = c.verdict_band;
-  entry.audited = [c.audited_baseline_bps, c.audited_replicated_bps, c.audited_integrity_bps].join('/');
-  entry.peer_challenge_deadline_epoch = Number(c.peer_challenge_deadline_epoch);
-  entry.deviation_bps = c.deviation_bps;
-  entry.eval_exec = row.exec;
-  entry.votes = row.votes;
-  entry.evaluate_hash = row.hash;
-  saveCkpt(lab.ck);
-  console.log('evaluated', key, c.verdict_band, entry.audited, 'deviation', c.deviation_bps);
+  const keys = process.argv[3] ? [process.argv[3]] : ['drift', 'crispr', 'meissner'];
+  for (const key of keys) {
+    const entry = lab.ck.studies[key];
+    await waitChainTime(lab, entry.trial_close_epoch + 35, 3);
+    const row = await lab.write('evaluate-' + key, 'pi', lab.ledger, 'evaluate_replication_trial', [sid(lab, key)]);
+    const c = await card(lab, key);
+    entry.band = c.verdict_band;
+    entry.audited = [c.audited_baseline_bps, c.audited_replicated_bps, c.audited_integrity_bps].join('/');
+    entry.peer_challenge_deadline_epoch = Number(c.peer_challenge_deadline_epoch);
+    entry.deviation_bps = c.deviation_bps;
+    entry.eval_exec = row.exec;
+    entry.votes = row.votes;
+    entry.evaluate_hash = row.hash;
+    saveCkpt(lab.ck);
+    console.log('evaluated', key, c.verdict_band, entry.audited, 'deviation', c.deviation_bps);
+  }
 }
 
 async function stepSettle(lab) {
@@ -577,6 +585,14 @@ async function stepSettle(lab) {
     lab.ledger,
     'challenge_replication_ruling_payable',
     [sid(lab, 'crispr'), 'requesting an independent re-audit of the deviation band'],
+    CHALLENGE_BOND
+  );
+  await lab.write(
+    'challenge-meissner-labC',
+    'labC',
+    lab.ledger,
+    'challenge_replication_ruling_payable',
+    [sid(lab, 'meissner'), 'requesting meissner re-evaluation before timeout'],
     CHALLENGE_BOND
   );
   await waitChainTime(lab, entry.peer_challenge_deadline_epoch, 3);
@@ -868,12 +884,17 @@ async function stepReport(lab) {
     const key = [
       'deploy-ledger',
       'deploy-rlt',
+      'seed-rlt-transfer-labB',
+      'deposit-ledger-unconfirmed',
+      'recover-failed-deposit',
+      'recover-failed-deposit-replay',
       'register-drift',
       'stake-drift-labB',
       'gate-evaluate-too-early',
       'evaluate-drift',
       'settle-too-early',
       'challenge-crispr-labB',
+      'challenge-meissner-labC',
       'settle-drift',
       'zerowinner-refund',
       'expired-refund-meissner',

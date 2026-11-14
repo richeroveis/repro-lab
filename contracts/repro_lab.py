@@ -4,9 +4,6 @@ from genlayer import *
 from dataclasses import dataclass, fields
 import re
 
-# ReproLab reproducibility bounty ledger: payables soft-fail and never revert
-# value; every bounty and bond stays reserved at 150 percent maximum liability.
-
 ERROR_EXPECTED = "[EXPECTED]"
 ERROR_TRANSIENT = "[TRANSIENT]"
 ERROR_LLM = "[LLM_ERROR]"
@@ -49,7 +46,6 @@ _HEX64 = re.compile(r"^[0-9a-f]{64}$")
 
 
 def _addr(a) -> str:
-    """Normalize any address encoding to a lowercase hex key."""
     if isinstance(a, (bytes, bytearray)):
         return "0x" + a.hex()
     return str(a).lower()
@@ -92,7 +88,6 @@ def _require_sha256_hex(value: str, label: str) -> str:
 
 
 def _now_epoch() -> int:
-    """Deterministic GenVM transaction timestamp, never a local clock."""
     raw = gl.message_raw["datetime"]
     if isinstance(raw, int):
         return int(raw)
@@ -108,7 +103,6 @@ def _now_epoch() -> int:
     date_bits = parts[0].split("-")
     time_bits = parts[1].split(":") if len(parts) > 1 else ["0", "0", "0"]
     y, mo, d = int(date_bits[0]), int(date_bits[1]), int(date_bits[2])
-    # Civil UTC date to days since the Unix epoch.
     yy = y - 1 if mo <= 2 else y
     era = yy // 400
     yoe = yy - era * 400
@@ -120,9 +114,8 @@ def _now_epoch() -> int:
 
 
 def _num(resp: dict, field: str) -> float:
-    raw = resp.get(field)
     try:
-        return float(str(raw).strip())
+        return float(str(resp.get(field)).strip())
     except (ValueError, TypeError):
         raise gl.vm.UserError(ERROR_LLM + " not numeric " + field)
 
@@ -146,14 +139,12 @@ def _need_dict(resp) -> dict:
 
 
 def _lazy(value):
-    # Lazy is not star-exported; duck-type on the class name.
     if type(value).__name__ == "Lazy":
         return value.get()
     return value
 
 
 def _derive_payouts(band: str, endowment: int, first_bond: int) -> tuple:
-    """Consensus-bound payout thresholds for one band."""
     if band == BAND_FRAUD:
         return 0, endowment, first_bond
     if band == BAND_EXACT:
@@ -204,6 +195,8 @@ class Study:
     audited_integrity_bps: u256
     slash_target: str
     evaluated_at_epoch: u256
+    challenger_address: str
+    prior_verdict_band: str
 
 
 class RLTToken:
@@ -223,6 +216,9 @@ class ReproLab(gl.Contract):
     token_balances: TreeMap[str, u256]
     pending_rlt_credit_amount: u256
     pending_rlt_credit_ref: u256
+    pending_rlt_credit_deadline: u256
+    pending_rlt_credit_depositor: str
+    confirmed_deposits: TreeMap[u256, bool]
 
     refundable_balances: TreeMap[str, u256]
     last_payable_rejection: TreeMap[str, str]
@@ -234,22 +230,20 @@ class ReproLab(gl.Contract):
     endowment_pool_atto: u256
     external_payouts_atto: u256
     soft_fail_count: u256
-    pending_rlt_credit_depositor: str
+
     def __init__(self, rlt_token: Address):
         self.rlt_token_address = Address(rlt_token)
         self.study_counter = u256(0)
 
-
     def _soft_fail_payable(self, reason: str) -> None:
-        """Joaquin rule: a payable carrying value never reverts."""
         sender = _addr(gl.message.sender_address)
         value = int(gl.message.value)
         if value > 0:
             self.refundable_balances[sender] = self.refundable_balances.get(sender, u256(0)) + value
         self.last_payable_rejection[sender] = _sanitize_token(reason, 200)
         self.soft_fail_count = u256(int(self.soft_fail_count) + 1)
+
     def _fail(self, reason: str) -> None:
-        """Rule 8: soft-fail with value, revert without."""
         if int(gl.message.value) > 0:
             self._soft_fail_payable(reason)
         else:
@@ -258,18 +252,23 @@ class ReproLab(gl.Contract):
     def _credit_native(self, target: str, amount: int, reason: str) -> None:
         if amount <= 0:
             return
-        self.refundable_balances[target] = self.refundable_balances.get(target, u256(0)) + amount
-        self.last_payable_rejection[target] = _sanitize_token(reason, 200)
+        t = _addr(target)
+        self.refundable_balances[t] = self.refundable_balances.get(t, u256(0)) + amount
+        self.last_payable_rejection[t] = _sanitize_token(reason, 200)
+
     def _pay_from_pool(self, target: str, amount: int, reason: str) -> None:
         if amount <= 0:
             return
         self.endowment_pool_atto = u256(int(self.endowment_pool_atto) - amount)
         self._credit_native(target, amount, reason)
+
     def _reserve_for(self, endowment_atto: int) -> int:
         return int(endowment_atto) * _RESERVE_BPS // 10000
+
     def _outstanding_bonds(self, study: Study) -> int:
         return (int(study.first_claim_bond_atto) + int(study.other_bonds_atto)
                 + int(study.challenge_bond_atto) - int(study.bonds_consumed_atto))
+
     def _locked_and_bonds(self) -> tuple:
         locked = 0
         bonds = 0
@@ -279,14 +278,15 @@ class ReproLab(gl.Contract):
                 locked += int(study.endowment_atto)
                 bonds += max(0, self._outstanding_bonds(study))
         return locked, bonds
+
     def _total_locked(self) -> int:
         return self._locked_and_bonds()[0]
+
     def _reserve_required_total(self) -> int:
-        """150 percent of escrowed endowments plus every open bond."""
         locked, bonds = self._locked_and_bonds()
         return self._reserve_for(locked) + bonds
+
     def _compute_study_audit_state(self, study: Study, snapshot_at: int) -> dict:
-        """The one invariant gate shared by views and settlement."""
         deviation_bps = abs(int(study.audited_baseline_bps) - int(study.audited_replicated_bps))
         open_status = study.status in OPEN_STATUSES
         reserve = self._reserve_for(int(study.endowment_atto))
@@ -310,25 +310,26 @@ class ReproLab(gl.Contract):
                     (snapshot_at >= int(study.trial_close_epoch) and study.claim_count == 0)
                     or snapshot_at >= int(study.audit_timeout_epoch))),
         }
+
     def _fetch_page_text(self, url: str, label: str) -> str:
         body = str(_lazy(gl.nondet.web.render(url, mode="text")))
         if len(body) < 24:
             raise gl.vm.UserError(ERROR_TRANSIENT + " short fetch " + label)
         return body
+
     def _run_trial_audit(
         self, artifact_url: str, log_url: str, target: str,
         claimed_rep_bps: int, claimed_int_bps: int, checksum: str,
         endowment: int, first_bond: int,
     ) -> dict:
-        """Nondeterministic core: live fetch, quantize, band, derive payouts."""
         artifact_text = self._fetch_page_text(artifact_url, "artifact")[:5000]
         log_text = self._fetch_page_text(log_url, "log")[:5000]
 
         baseline_resp = _lazy(gl.nondet.exec_prompt(
-            "Metrics audit: from the artifact below find the headline "
-            "quantitative result named " + target + ". Express it as a 0..10000 "
-            "basis-point integer (percentage times 100). Answer 0 only if no "
-            "such number exists. JSON {\"effect_size_bps\": number}.\n" + artifact_text,
+            "Metrics audit: from the artifact below find the headline quantitative result named "
+            + target + ". Express it as a 0..10000 basis-point integer (percentage times 100). "
+            "Answer 0 only if no such number exists. JSON {\"effect_size_bps\": number}.\n"
+            + artifact_text,
             response_format="json",
         ))
         live_baseline = _num(_need_dict(baseline_resp), "effect_size_bps")
@@ -339,13 +340,10 @@ class ReproLab(gl.Contract):
             raise _err("no quantitative baseline")
 
         audit_resp = _lazy(gl.nondet.exec_prompt(
-            "Replication audit. Verify ledger claims against the log, never "
-            "invent numbers: replicated score " + str(claimed_rep_bps) + " bps, "
-            "integrity " + str(claimed_int_bps) + " bps, checksum " + checksum
-            + ". Judge methodology_valid (real independent replication "
-            "protocol), fabrication_detected (checksum tampering, p-hacking, "
-            "synthetic logs). JSON {\"methodology_valid\": bool, "
-            "\"fabrication_detected\": bool}.\n" + log_text,
+            "Replication audit. Verify ledger claims against the log, never invent numbers: "
+            "replicated score " + str(claimed_rep_bps) + " bps, integrity " + str(claimed_int_bps)
+            + " bps, checksum " + checksum + ". Judge methodology_valid, fabrication_detected. "
+            "JSON {\"methodology_valid\": bool, \"fabrication_detected\": bool}.\n" + log_text,
             response_format="json",
         ))
         methodology_valid = _flag(_need_dict(audit_resp), "methodology_valid")
@@ -374,24 +372,36 @@ class ReproLab(gl.Contract):
             "derived_fraud_slash": fraud_slash,
         }
 
-
     @gl.public.write
     def deposit_rlt_custody(self, amount_atto: u256) -> None:
-        """Pull RLT from the caller into vault custody."""
         if int(amount_atto) <= 0:
             raise _err("deposit must be positive")
+        now = _now_epoch()
         if int(self.pending_rlt_credit_amount) > 0:
-            raise _err("pending deposit in flight")
+            if now < int(self.pending_rlt_credit_deadline):
+                raise _err("pending deposit in flight")
+            self.pending_rlt_credit_amount = u256(0)
         ref = u256(int(self.pending_rlt_credit_ref) + 1)
         self.pending_rlt_credit_amount = amount_atto
         self.pending_rlt_credit_ref = ref
         self.pending_rlt_credit_depositor = _addr(gl.message.sender_address)
+        self.pending_rlt_credit_deadline = u256(now + 120)
         RLTFace(self.rlt_token_address).emit().deposit_into_ledger(
             str(gl.message.contract_address), self.pending_rlt_credit_depositor,
             amount_atto, ref)
+
+    @gl.public.write
+    def reconcile_pending_deposit(self) -> None:
+        now = _now_epoch()
+        if int(self.pending_rlt_credit_amount) == 0:
+            return
+        sender = _addr(gl.message.sender_address)
+        if sender == self.pending_rlt_credit_depositor or now >= int(self.pending_rlt_credit_deadline):
+            self.pending_rlt_credit_amount = u256(0)
+            self.pending_rlt_credit_depositor = ""
+
     @gl.public.write.min_gas(leader=1000000, validator=1000000).payable
     def on_rlt_received(self, depositor: str, amount_atto: u256, ref: u256) -> None:
-        """Callback credit; only the pinned RLT token may settle."""
         if _addr(gl.message.sender_address) != _addr(self.rlt_token_address):
             raise _err("only RLT token may credit")
         if int(amount_atto) <= 0 or int(ref) != int(self.pending_rlt_credit_ref):
@@ -404,10 +414,16 @@ class ReproLab(gl.Contract):
         self.pending_rlt_credit_depositor = ""
         self.token_balances[depositor] = self.token_balances.get(depositor, u256(0)) + amount_atto
         self.vault_custody_balance = u256(int(self.vault_custody_balance) + int(amount_atto))
+        self.confirmed_deposits[ref] = True
         self.pending_rlt_credit_amount = u256(0)
+        RLTFace(self.rlt_token_address).emit().confirm_deposit(ref)
+
+    @gl.public.view
+    def is_deposit_confirmed(self, deposit_id: u256) -> bool:
+        return bool(self.confirmed_deposits.get(deposit_id, False))
+
     @gl.public.write
     def withdraw_rlt_custody(self, amount_atto: u256) -> None:
-        """Return vaulted RLT to the caller's token balance."""
         sender = _addr(gl.message.sender_address)
         held = int(self.token_balances.get(sender, u256(0)))
         if int(amount_atto) <= 0 or held < int(amount_atto) or int(self.vault_custody_balance) < int(amount_atto):
@@ -416,16 +432,15 @@ class ReproLab(gl.Contract):
         self.vault_custody_balance = u256(int(self.vault_custody_balance) - int(amount_atto))
         RLTFace(self.rlt_token_address).emit().transfer(sender, amount_atto)
 
-
     @gl.public.write.payable
     def fund_endowment_payable(self) -> None:
-        """Lock endowment principal into the escrow pool."""
         value = int(gl.message.value)
         if value < _MIN_ENDOWMENT:
             self._fail("endowment below minimum " + str(_MIN_ENDOWMENT))
             return
         self.endowment_pool_atto = u256(int(self.endowment_pool_atto) + value)
         self.last_payable_rejection[_addr(gl.message.sender_address)] = "funded " + str(value)
+
     @gl.public.write.payable
     def register_study_bounty_payable(
         self, title: str, paper_artifact_url: str, replication_target: str,
@@ -465,10 +480,8 @@ class ReproLab(gl.Contract):
         elif value < endowment:
             bad = "send at least the endowment"
         else:
-            # Fail-closed 150 percent reservation.
-            pool_after = int(self.endowment_pool_atto) + value - endowment
             reserve_after = self._reserve_for(self._total_locked() + endowment) + self._locked_and_bonds()[1]
-            if pool_after < reserve_after:
+            if int(self.endowment_pool_atto) < reserve_after:
                 bad = "pool fails 150 percent reservation"
         if bad != "":
             self._fail(bad)
@@ -488,15 +501,14 @@ class ReproLab(gl.Contract):
             first_claim_lab="", first_claim_bond_atto=0,
             challenge_bond_atto=0, other_bonds_atto=0, bonds_consumed_atto=0,
             verdict_band="", audited_baseline_bps=0, audited_replicated_bps=0,
-            audited_integrity_bps=0, slash_target="", evaluated_at_epoch=0)
+            audited_integrity_bps=0, slash_target="", evaluated_at_epoch=0,
+            challenger_address="", prior_verdict_band="")
         self.study_ids.append(study_id)
-        self.endowment_pool_atto = u256(pool_after)
         surplus = value - endowment
         if surplus > 0:
-            # Surplus is credited back, never locked twice.
-            self.endowment_pool_atto = u256(int(self.endowment_pool_atto) - surplus)
             self._credit_native(sender, surplus, "registration surplus returned")
         self.last_payable_rejection[sender] = "study " + str(int(study_id)) + " registered"
+
     @gl.public.write.payable
     def stake_replication_trial_payable(
         self, study_id: u256, claimed_replicated_score_bps: u256,
@@ -522,7 +534,7 @@ class ReproLab(gl.Contract):
             bad = "lab already staked"
         elif value < _MIN_TRIAL_BOND:
             bad = "bond below minimum"
-        elif int(self.endowment_pool_atto) - value < self._reserve_required_total():
+        elif int(self.endowment_pool_atto) < self._reserve_required_total() + value:
             bad = "pool cannot reserve new bond"
         else:
             try:
@@ -554,7 +566,7 @@ class ReproLab(gl.Contract):
         if updated.status == STATUS_ACTIVE:
             updated.status = STATUS_AWAITING_AUTHOR
         self.studies[study_id] = updated
-        self.endowment_pool_atto = u256(int(self.endowment_pool_atto) - value)
+
     @gl.public.write
     def submit_author_response(self, study_id: u256, rebuttal_note: str) -> None:
         now = _now_epoch()
@@ -573,9 +585,9 @@ class ReproLab(gl.Contract):
         updated.status = STATUS_READY
         self.studies[study_id] = updated
         self.last_payable_rejection[study.pi_address] = "author responded " + note[:80]
+
     @gl.public.write
     def evaluate_replication_trial(self, study_id: u256) -> dict:
-        """Live validator audit; gated behind trial close plus rebuttal."""
         now = _now_epoch()
         study = self.studies.get(study_id)
         if study is None:
@@ -590,7 +602,6 @@ class ReproLab(gl.Contract):
         if int(self.endowment_pool_atto) < self._reserve_required_total():
             raise _err("pool below reservation")
 
-        # Snapshot storage into plain locals before nondet.
         artifact_url = str(study.paper_artifact_url)
         target = str(study.title)
         endowment = int(study.endowment_atto)
@@ -625,6 +636,7 @@ class ReproLab(gl.Contract):
         updated.evaluated_at_epoch = now
         self.studies[study_id] = updated
         return self._compute_study_audit_state(updated, _now_epoch())
+
     @gl.public.write.payable
     def challenge_replication_ruling_payable(self, study_id: u256, note: str) -> None:
         sender = _addr(gl.message.sender_address)
@@ -642,20 +654,21 @@ class ReproLab(gl.Contract):
             bad = "party cannot self-challenge"
         elif value < _MIN_CHALLENGE_BOND:
             bad = "challenge bond too small"
-        elif int(self.endowment_pool_atto) - 2 * value < self._reserve_required_total():
+        elif int(self.endowment_pool_atto) < self._reserve_required_total() + value:
             bad = "pool cannot reserve challenge"
         if bad != "":
             self._fail(bad)
             return
         updated = study
         updated.status = STATUS_READY
+        updated.challenger_address = sender
+        updated.prior_verdict_band = study.verdict_band
         updated.challenge_bond_atto = u256(int(study.challenge_bond_atto) + value)
         self.studies[study_id] = updated
-        self.endowment_pool_atto = u256(int(self.endowment_pool_atto) - value)
         self.last_payable_rejection[sender] = "challenge posted " + _sanitize_token(note, 120)
+
     @gl.public.write
     def settle_replication_grant(self, study_id: u256) -> dict:
-        """Rule 10: settles only after the peer-challenge deadline."""
         now = _now_epoch()
         study = self.studies.get(study_id)
         if study is None:
@@ -670,36 +683,41 @@ class ReproLab(gl.Contract):
         other_bonds = int(study.other_bonds_atto)
         challenge_bond = int(study.challenge_bond_atto)
         grant, pi_refund, fraud_slash = _derive_payouts(band, endowment, first_bond)
-        outlay = grant + pi_refund + other_bonds + challenge_bond
-        if band == BAND_FRAUD:
-            outlay += endowment
-        if int(self.endowment_pool_atto) < outlay:
-            raise _err("pool cannot settle")
 
-        # Race-safe transition before any payout effect.
         updated = study
         updated.status = STATUS_FINALIZED
         self.studies[study_id] = updated
-        self.endowment_pool_atto = u256(int(self.endowment_pool_atto) + endowment)
+
         replicator = updated.first_claim_lab
-        bonds_to_take = first_bond + other_bonds + challenge_bond
+        self._credit_native(replicator, grant, "replication grant " + band)
+        self._credit_native(updated.pi_address, pi_refund, "sponsor share " + band)
+
         if band == BAND_FRAUD:
-            # The offending bond is already escrowed, so it pays the PI.
-            self.refundable_balances[updated.slash_target] = self.refundable_balances.get(updated.slash_target, u256(0)) + fraud_slash
-            self.last_payable_rejection[updated.slash_target] = _sanitize_token("fraud slash payout", 200)
-            self._credit_native(replicator, other_bonds + challenge_bond, "innocent bonds returned")
-            self._pay_from_pool(updated.pi_address, endowment, "fraud principal refund")
-            updated.bonds_consumed_atto = u256(int(updated.bonds_consumed_atto) + first_bond)
+            self._credit_native(updated.slash_target, fraud_slash, "fraud slash payout")
+            if other_bonds > 0:
+                self._credit_native(replicator, other_bonds, "innocent bonds returned")
         else:
-            self._pay_from_pool(replicator, grant, "replication grant " + band)
-            self._pay_from_pool(updated.pi_address, pi_refund, "sponsor share " + band)
-            self._credit_native(replicator, bonds_to_take, "bond returned")
-            updated.bonds_consumed_atto = u256(int(updated.bonds_consumed_atto) + bonds_to_take)
+            self._credit_native(replicator, first_bond, "bond returned")
+            if other_bonds > 0:
+                self._credit_native(replicator, other_bonds, "other bonds returned")
+
+        if challenge_bond > 0 and updated.challenger_address:
+            challenge_upheld = bool(
+                updated.prior_verdict_band != "" and updated.verdict_band != updated.prior_verdict_band
+            )
+            if challenge_upheld:
+                self._credit_native(updated.challenger_address, challenge_bond, "challenge bond returned: challenge upheld")
+            else:
+                defender = updated.slash_target if band == BAND_FRAUD else replicator
+                self._credit_native(defender, challenge_bond, "challenge bond awarded: challenge rejected")
+
+        total_bonds = first_bond + other_bonds + challenge_bond
+        updated.bonds_consumed_atto = u256(int(updated.bonds_consumed_atto) + total_bonds)
         self.studies[study_id] = updated
         return self._compute_study_audit_state(updated, _now_epoch())
+
     @gl.public.write
     def claim_unreplicated_or_expired_refund(self, study_id: u256) -> dict:
-        """ProphetGrid: zero-winner or expired studies refund in full."""
         now = _now_epoch()
         study = self.studies.get(study_id)
         if study is None:
@@ -709,22 +727,25 @@ class ReproLab(gl.Contract):
             raise _err("refund gate closed")
         principal = int(study.endowment_atto)
         outstanding = max(0, self._outstanding_bonds(study))
-        if int(self.endowment_pool_atto) < principal + outstanding:
-            raise _err("pool cannot fund refund")
 
         updated = study
         updated.status = STATUS_EXPIRED
         self.studies[study_id] = updated
-        self.endowment_pool_atto = u256(int(self.endowment_pool_atto) + principal)
-        self._pay_from_pool(updated.pi_address, principal, "zero-winner principal refund")
+
+        self._credit_native(updated.pi_address, principal, "zero-winner principal refund")
         if outstanding > 0:
             for lab_addr in updated.claim_labs:
                 t = self.trials.get(_tkey(study_id, lab_addr))
                 if t is not None:
                     self._credit_native(lab_addr, int(t.bond_atto), "expired trial bond refund")
+            if int(updated.challenge_bond_atto) > 0 and updated.challenger_address:
+                self._credit_native(
+                    updated.challenger_address, int(updated.challenge_bond_atto), "expired challenge bond refund"
+                )
             updated.bonds_consumed_atto = u256(int(updated.bonds_consumed_atto) + outstanding)
             self.studies[study_id] = updated
         return self._compute_study_audit_state(updated, _now_epoch())
+
     @gl.public.write
     def withdraw_refund(self, amount: u256) -> None:
         sender = _addr(gl.message.sender_address)
@@ -735,6 +756,7 @@ class ReproLab(gl.Contract):
         gl.get_contract_at(Address(sender)).emit_transfer(value=amount)
         self.external_payouts_atto = u256(int(self.external_payouts_atto) + int(amount))
         self.last_payable_rejection[sender] = "withdrew " + str(int(amount))
+
     @gl.public.write
     def claim_refundable_balance(self) -> None:
         sender = _addr(gl.message.sender_address)
@@ -745,7 +767,6 @@ class ReproLab(gl.Contract):
         gl.get_contract_at(Address(sender)).emit_transfer(value=u256(credit))
         self.external_payouts_atto = u256(int(self.external_payouts_atto) + credit)
         self.last_payable_rejection[sender] = "claimed " + str(credit)
-
 
     @gl.public.view
     def get_study_card(self, study_id: u256) -> dict:
@@ -766,6 +787,7 @@ class ReproLab(gl.Contract):
         card["now_epoch"] = str(_now_epoch())
         card.update(self._compute_study_audit_state(study, _now_epoch()))
         return card
+
     @gl.public.view
     def get_trial_book(self, study_id: u256) -> list:
         out = []
@@ -780,6 +802,7 @@ class ReproLab(gl.Contract):
                     row[f.name] = str(getattr(t, f.name))
                 out.append(row)
         return out
+
     @gl.public.view
     def get_lab_overview(self) -> dict:
         locked, open_bonds = self._locked_and_bonds()
@@ -810,6 +833,7 @@ class ReproLab(gl.Contract):
             "soft_fail_count": str(int(self.soft_fail_count)),
             "snapshot_at_epoch": str(_now_epoch()),
         }
+
     @gl.public.view
     def get_reproducibility_index(self, start_index: u256, page_size: u256) -> list:
         out = []
@@ -820,25 +844,32 @@ class ReproLab(gl.Contract):
             if study is not None:
                 out.append(self._compute_study_audit_state(study, _now_epoch()))
         return out
+
     @gl.public.view
     def get_refundable_balance(self, target: str) -> u256:
         return self.refundable_balances.get(_addr(target), u256(0))
+
     @gl.public.view
     def get_last_payable_rejection(self, target: str) -> str:
         return str(self.last_payable_rejection.get(_addr(target), "none"))
+
     @gl.public.view
     def get_rlt_balance(self, target: str) -> u256:
         return self.token_balances.get(_addr(target), u256(0))
+
     @gl.public.view
     def get_custody_accounting_summary(self) -> dict:
         credits = 0
         for _addr, amount in self.refundable_balances.items():
             credits += int(amount)
-        locked = self._total_locked()
+        locked, open_bonds = self._locked_and_bonds()
         reserve_required = self._reserve_required_total()
+        total_custody = int(self.endowment_pool_atto) + locked + open_bonds + credits
         return {
             "endowment_pool_atto": str(int(self.endowment_pool_atto)),
             "total_endowment_locked": str(locked),
+            "open_bonds_atto": str(open_bonds),
+            "total_custody_liabilities_atto": str(total_custody),
             "reserve_required_atto": str(reserve_required),
             "pool_covers_reserve": bool(int(self.endowment_pool_atto) >= reserve_required),
             "vault_custody_balance": str(int(self.vault_custody_balance)),

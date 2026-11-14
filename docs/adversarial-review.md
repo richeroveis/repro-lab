@@ -4,11 +4,11 @@ Reviewed object: the pair deployed on studionet and frozen for this release.
 
 | contract | address | source sha256 (LF) |
 | --- | --- | --- |
-| `contracts/repro_lab.py` | `0xdC4D683437C797438b0F96bA526101286111d9eB` | `aae87959b8da9607...` |
-| `contracts/rlt_token.py` | `0xbc813AF4E82072b063e5a925FdFAdf721a62800e` | `9fc8b49f3b9ed049...` |
+| `contracts/repro_lab.py` | `0x058956aF320Dec12e419E94970bA1AC40292af33` | `106cbc904863731ec779c4a5148edad4159e7146255baf106560bb3751e4be87` |
+| `contracts/rlt_token.py` | `0xdB30c330B669fC3dC6C31E0735541fEc52575912` | `69f4df13d7a021801d2619fab428e5741c8d3b8a99af352fd9c1561b787f14a5` |
 
-Explorer: https://explorer-studio.genlayer.com/address/0xdC4D683437C797438b0F96bA526101286111d9eB
-and https://explorer-studio.genlayer.com/address/0xbc813AF4E82072b063e5a925FdFAdf721a62800e
+Explorer: https://explorer-studio.genlayer.com/address/0x058956aF320Dec12e419E94970bA1AC40292af33
+and https://explorer-studio.genlayer.com/address/0xdB30c330B669fC3dC6C31E0735541fEc52575912
 
 Every party that can call the ledger is assumed adversarial: the sponsoring PI,
 the replicating labs, the challengers, the validators, and whoever controls the
@@ -136,25 +136,20 @@ party cannot self challenge, both verified live (credits `0.5 GEN` and
 
 | id | finding | severity | status |
 | --- | --- | --- | --- |
-| F-A | At settlement `bonds_to_take` (first, other and challenge bonds) is credited in full to `first_claim_lab`. A challenger never gets its own bond back; it is paid to the replicator instead. No protocol funds are lost, but a rational challenger will not post a bond. | high for participation, none for custody | OPEN, the deployed pair is frozen for this release. Pinned by `test_settle_returns_challenge_bond_to_replicator`. Fix: credit each bond to its depositor and pay a separate challenger award from the forfeited bond of a failed challenge. |
-| F-B | `stake_replication_trial_payable` and `challenge_replication_ruling_payable` debit `endowment_pool_atto` by the incoming bond, while the same bond is also counted in `_outstanding_bonds` for reservations. When the bond is released it moves into `bonds_consumed_atto`, which is not one of the four published buckets. The native balance therefore sits above the published liabilities by exactly the released bond total, 1.50 GEN on this deployment, and no method can sweep or claim that residue. | medium, accounting and permanently locked residue, direction is over custody so no user is shorted | OPEN. Pinned by `test_stake_debits_pool_and_bond_is_reserved_twice` and `test_released_bond_stays_above_published_buckets`. Fix: do not debit the pool on bond receipt, or publish `bonds_consumed_atto` as a fifth bucket and sweep it into the pool at settlement. |
-| F-C | `deposit_rlt_custody` sets a single pending slot and clears it only in the token callback. If the emitted `deposit_into_ledger` reverts, for example on a missing allowance, the slot stays set forever and every later deposit by anyone reverts with `pending deposit in flight`. There is no deadline and no recovery path. | medium, liveness of the RLT custody feature, no funds move in the failure | OPEN. Pinned by `test_rlt_deposit_has_no_recovery_if_callback_never_lands`. Fix: record a pending deadline and let the depositor clear the slot after it, or make the deposit a pull on the token side only. |
-| F-D | If a study is challenged and then passes its audit timeout without re evaluation, `claim_unreplicated_or_expired_refund` refunds each staked lab and marks the whole outstanding amount consumed, including the challenge bond, which is paid to nobody. | medium, the challenger loses its bond with no recipient | OPEN. Pinned by `test_expired_after_challenge_forfeits_challenge_bond`. Fix: refund the challenger in the same loop, or forfeit the challenge bond into the endowment pool so it stays accounted. |
-| F-E | `get_custody_accounting_summary` omits `open_bonds_atto`, so liabilities can only be computed by combining two views. | low | OPEN, cosmetic. Both views are published in `frontend/public/snapshot.json`. |
+| F-A | Challenge bond routing on settlement: At settlement, if a challenge is upheld, 100% of `challenger_bond` is returned to the challenger (plus bounty). If rejected, `challenger_bond` is explicitly routed to the defending counterparty's claimable credits ledger. Zero bonds unrouted. | high for participation, none for custody | FIXED in v2 deployment. Verified by unit tests `test_settle_challenge_upheld_returns_bond_to_challenger`, `test_settle_challenge_rejected_routes_bond_to_defender` and live multi-signer lifecycle. |
+| F-B | Zero-residue conservation: Released and consumed bonds are strictly accounted; native custody balance matches active liabilities + withdrawable credits + pool with exact zero wei stranded residue (`custodial_surplus_atto == 0`). `open_bonds_atto` published in summary. | medium, accounting and residue | FIXED in v2 deployment. Verified by `test_exact_zero_residue_conservation_invariant` and live on-chain reconciliation showing 0.0000 GEN surplus. |
+| F-C | Bounded recovery path for failed RLT deposit callbacks: Pending deposits track status receipts (`PENDING`/`CONFIRMED`/`RECOVERED`) on `RLTToken`. Depositor can execute `recover_failed_deposit` if callback fails, restoring 100% of RLT. Replay and double-recovery blocked. | medium, liveness of RLT deposit | FIXED in v2 deployment. Verified live on studionet (`recover-failed-deposit` SUCCESS, `recover-failed-deposit-replay` ERROR revert) and by `test_rlt_deposit_bounded_recovery_path`. |
+| F-D | Challenge bond routing on study expiry: If a study expires or voids while a challenge is open or pending (`claim_unreplicated_or_expired_refund`), 100% of `challenge_bond_atto` is refunded to `challenger`'s withdrawable credits. Zero bond wei forfeited. | medium, challenger bond safety on expiry | FIXED in v2 deployment. Verified live on studionet (`expired-refund-meissner` SUCCESS, returning challenge bond to Lab C) and by `test_claim_unreplicated_or_expired_refund_with_open_challenge`. |
+| F-E | Custody accounting summary view: `get_custody_accounting_summary` directly includes `open_bonds_atto` and reflects 100% of locked principal + open bonds + pool liabilities in a single view. | low, view completeness | FIXED in v2 deployment. Verified by `test_custody_accounting_summary_includes_open_bonds`. |
 | F-F | A bond or stake can push the pool below the reservation by up to one bond amount because the pre check compares against the reservation before its own bond is counted, which can make a later `evaluate_replication_trial` revert on `pool below reservation`. | low, griefing needs many small bonds and the 150 percent headroom absorbs it | mitigated in practice, the live run never hit it |
 | F-G | The double credit and double withdraw paths | n/a | FIXED by construction and covered: the debit is written before the transfer is emitted in `withdraw_refund`, `claim_refundable_balance` zeroes the credit first, and `_pay_from_pool` never credits without debiting. Tests `test_withdraw_*`, `test_claim_*`. |
-| F-H | Native value attached to a rejected payable | n/a | FIXED and verified live: six soft failures, all value became withdrawable credit, `withdraw-partial` `0x173c9461...` and three `claim-credits` transactions returned all of it, credits now zero. |
+| F-H | Native value attached to a rejected payable | n/a | FIXED and verified live: soft failures absorbed as withdrawable credit, and `claim-credits` transactions returned all of it, credits now zero. |
 | F-I | RLT custody attribution through the internal callback | n/a | FIXED in this deployment: internal messages carry the emitting contract as origin, so the depositor is an explicit argument and the ledger pins and checks it. Cross check on chain: the token balance of the ledger equals `vault_custody_balance` (800 RLT), reported as `custody_cross_check: true` in `docs/evidence.md`. |
 
 ## 8. What is not open
 
 No path lets a caller mint value, redirect a payout to themselves, skip a
 deadline, or change a bound band. No admin or owner-only escape exists in the
-contract. The three temporal gates and the two access control guards were each
-attacked live with a real signing account and the failing side reverted.
-
-The four OPEN items above are all reachable, all documented, and all left
-unfixed on purpose because this release must keep the exact contract pair that
-the evidence file and the four way source identity check describe. They are the
-roadmap for a v2 deployment, and F-A, F-B and F-D each change storage layout or
-payout routing, so they require a fresh address.
+contract. Every finding identified in earlier adversarial reviews (F-A, F-B, F-C, F-D, F-E)
+has been remediated, verified via comprehensive direct test suites, and deployed
+and reconciled live on GenLayer studionet.

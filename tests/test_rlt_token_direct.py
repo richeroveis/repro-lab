@@ -129,3 +129,44 @@ def test_deposit_rejects_bad_depositor_address(
 def test_balance_of_unknown_account_is_zero(direct_deploy, direct_vm, direct_alice):
     t = deploy_token(direct_deploy, direct_vm, direct_alice)
     assert int(t.balanceOf("0x" + "1" * 40)) == 0
+
+
+def test_recover_failed_deposit_restores_balance_and_blocks_replay(
+    direct_deploy, direct_vm, direct_alice, direct_bob, direct_charlie
+):
+    """Remediation 3: Failed RLT deposit callback recovery restores balance and blocks double recovery."""
+    t = deploy_token(direct_deploy, direct_vm, direct_alice)
+    t.approve(hexof(direct_bob), 5 * E1)
+
+    # Bob (acting as unconfirmed ledger) executes deposit_into_ledger
+    assert deposit(t, direct_vm, direct_alice, direct_bob, 3 * E1, 42) in (True, 1)
+    assert int(t.balanceOf(direct_alice)) == SUPPLY - 3 * E1
+    assert int(t.balanceOf(direct_bob)) == 3 * E1
+
+    receipt = t.get_deposit_receipt(42)
+    assert receipt["status"] == "PENDING"
+    assert receipt["depositor"] == hexof(direct_alice).lower()
+    assert int(receipt["amount"]) == 3 * E1
+
+    # Unauthorized caller cannot recover
+    direct_vm.sender = direct_charlie
+    with direct_vm.expect_revert("only depositor may recover"):
+        t.recover_failed_deposit(42)
+
+    # Unknown deposit cannot be recovered
+    direct_vm.sender = direct_alice
+    with direct_vm.expect_revert("unknown deposit"):
+        t.recover_failed_deposit(999)
+
+    # Original depositor successfully recovers stranded tokens
+    assert t.recover_failed_deposit(42) in (True, 1)
+    assert int(t.balanceOf(direct_alice)) == SUPPLY
+    assert int(t.balanceOf(direct_bob)) == 0
+
+    receipt_after = t.get_deposit_receipt(42)
+    assert receipt_after["status"] == "RECOVERED"
+
+    # Replay is blocked by idempotent status guard
+    with direct_vm.expect_revert("deposit not pending"):
+        t.recover_failed_deposit(42)
+

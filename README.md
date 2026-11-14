@@ -13,13 +13,13 @@ Live site: https://richeroveis.github.io/repro-lab/
 
 | thing | value |
 | --- | --- |
-| Ledger contract | `0xdC4D683437C797438b0F96bA526101286111d9eB` |
-| Ledger on explorer | https://explorer-studio.genlayer.com/address/0xdC4D683437C797438b0F96bA526101286111d9eB |
-| RLT endowment token | `0xbc813AF4E82072b063e5a925FdFAdf721a62800e` |
-| RLT on explorer | https://explorer-studio.genlayer.com/address/0xbc813AF4E82072b063e5a925FdFAdf721a62800e |
+| Ledger contract | `0x058956aF320Dec12e419E94970bA1AC40292af33` |
+| Ledger on explorer | https://explorer-studio.genlayer.com/address/0x058956aF320Dec12e419E94970bA1AC40292af33 |
+| RLT endowment token | `0xdB30c330B669fC3dC6C31E0735541fEc52575912` |
+| RLT on explorer | https://explorer-studio.genlayer.com/address/0xdB30c330B669fC3dC6C31E0735541fEc52575912 |
 | Network | studionet, chain id 61999, gasless |
 | Runner | pinned `py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6` |
-| Evidence | [docs/evidence.md](docs/evidence.md), 37 transactions, all explorer verified |
+| Evidence | [docs/evidence.md](docs/evidence.md), 46 transactions, all explorer verified |
 | Security review | [docs/adversarial-review.md](docs/adversarial-review.md) |
 | Deployment guide | [docs/deployment.md](docs/deployment.md) |
 | Demo brief | [docs/demo-video-subtitled.mp4](docs/demo-video-subtitled.mp4), 50 s, subtitled, with audio |
@@ -31,12 +31,11 @@ afterwards, which is what the four way identity check proves.
 
 | item | value |
 | --- | --- |
-| Deployed source commit | `5413ae6de3662a8d3849c8727d2e06a6fc387976` |
-| Release tag | `studionet-v1` at the final `main` HEAD; the contract files there are byte identical to the deployed source |
-| Ledger deploy tx | `0xd578c7c292c9f4e190c89f75498376c31caa1dd71027841310737c541f0faf15`, FINALIZED, MAJORITY_AGREE, leader SUCCESS |
-| RLT deploy tx | `0x72361c8eda984a9b53c8c1434d72c69ae04b4adc6d40a669b29b73fe110ea8ca`, FINALIZED, MAJORITY_AGREE, leader SUCCESS |
-| `contracts/repro_lab.py` sha256 | `aae87959b8da96073cebfb0bb888da0299e1f05daa05864547dd52b1673a6a65`, 37,497 bytes |
-| `contracts/rlt_token.py` sha256 | `9fc8b49f3b9ed0493d390018908cc6f36959a12f2e0cd471eb31fee5368aa7d7`, 4,173 bytes |
+| Release tag | `studionet-v2` at the final `main` HEAD; the contract files there are byte identical to the deployed source |
+| Ledger deploy tx | `0xb30d8f5b1eb36b024d04f69bb644e60f80247263081797fb0fad4ea1ebeb84c8`, FINALIZED, MAJORITY_AGREE, leader SUCCESS |
+| RLT deploy tx | `0x6564a82600e7dfbbe1db949a566b1d820cbb0b8e59e11f7b0a555773d1713d62`, FINALIZED, MAJORITY_AGREE, leader SUCCESS |
+| `contracts/repro_lab.py` sha256 | `106cbc904863731ec779c4a5148edad4159e7146255baf106560bb3751e4be87`, 36,955 bytes |
+| `contracts/rlt_token.py` sha256 | `69f4df13d7a021801d2619fab428e5741c8d3b8a99af352fd9c1561b787f14a5`, 8,632 bytes |
 
 Reproduce with `node scripts/verify_source_identity.mjs all`, which requires the
 local file, the git blob, the GitHub raw file and the code the network returns for

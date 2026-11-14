@@ -1,7 +1,7 @@
 // Chain constants for the ReproLab notebook. Redeploying the ledger changes the
 // address, so this is the only file that has to be touched.
-export const LEDGER = '0xdC4D683437C797438b0F96bA526101286111d9eB';
-export const RLT_TOKEN = '0xbc813AF4E82072b063e5a925FdFAdf721a62800e';
+export const LEDGER = '0x058956aF320Dec12e419E94970bA1AC40292af33';
+export const RLT_TOKEN = '0xdB30c330B669fC3dC6C31E0735541fEc52575912';
 export const NETWORK = {
   name: 'studionet',
   chainId: 61999,

@@ -14,8 +14,8 @@ import { createClient, chains } from 'genlayer-js';
 
 const RAW_BASE = 'https://raw.githubusercontent.com/richeroveis/repro-lab/main/';
 const PAIRS = [
-  ['contracts/repro_lab.py', '0xdC4D683437C797438b0F96bA526101286111d9eB'],
-  ['contracts/rlt_token.py', '0xbc813AF4E82072b063e5a925FdFAdf721a62800e'],
+  ['contracts/repro_lab.py', '0x058956aF320Dec12e419E94970bA1AC40292af33'],
+  ['contracts/rlt_token.py', '0xdB30c330B669fC3dC6C31E0735541fEc52575912'],
 ];
 
 const sha = (buf) => crypto.createHash('sha256').update(buf).digest('hex');
