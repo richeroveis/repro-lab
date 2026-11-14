@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ReproLab replication log: LLM Quantization Perplexity Drift Study</title>
+<style>
+    body { background:#0B132B; color:#D7E1F0; font-family:'IBM Plex Serif',Georgia,serif;
+           margin:0 auto; max-width:46rem; padding:3rem 1.25rem 4rem; line-height:1.65 }
+    h1 { color:#06B6D4; font-size:1.5rem }
+    h2 { color:#10B981; font-size:1.05rem; margin-top:2rem }
+    .meta { font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:.78rem; color:#8AA0BF }
+    .headline { border-left:3px solid #10B981; background:#1C2541; padding:.9rem 1.1rem;
+                margin:1.6rem 0; font-family:'IBM Plex Mono',ui-monospace,monospace }
+    table { border-collapse:collapse; width:100%;
+            font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:.85rem }
+    td, th { border-bottom:1px solid #263252; padding:.4rem .5rem; text-align:left }
+    ul { padding-left:1.2rem }
+</style>
+</head>
+<body>
+<p class="meta">ReproLab independent replication log, peer-reviewable</p><h1>Replication log: LLM Quantization Perplexity Drift Study</h1>
+<p>Replicating group: Northgate Independent Replication Lab. This group has no author overlap with the original study and re-ran the frozen protocol from the public dataset.</p>
+<h2>Independent replication protocol</h2>
+<ul><li>Instrument: 2x A100 80GB, CUDA 12.4, transformer-engine 1.5</li><li>Sampling: seeds 17, 23, 41 (three independent runs, median reported)</li><li>Dataset obtained from the public record, checksum verified before analysis, no manual edits.</li><li>Analysis script pinned to the commit hash recorded below, all random seeds fixed, raw outputs published.</li></ul>
+<div class="headline">Measured quantization-perplexity-drift after replication: 52.50 percent, which is 5250 basis points. Dataset integrity score: 92.50 percent, which is 9250 basis points.</div>
+<table>
+<tr><th>Field</th><th>Value</th></tr>
+<tr><td>replicated score bps</td><td>5250</td></tr>
+<tr><td>dataset integrity bps</td><td>9250</td></tr>
+<tr><td>sha256 dataset checksum</td><td>7d21c4b9f0a53e18c6d7a0b215e94c3d8a6f1b0c2d3e4f50617283a4b5c6d7e8</td></tr>
+<tr><td>original reported percent</td><td>52.50</td></tr>
+</table>
+<p class="meta">Deviations between the original and this replication are reported in full. No sample was excluded and no threshold was tuned after the runs.</p>
+</body>
+</html>
